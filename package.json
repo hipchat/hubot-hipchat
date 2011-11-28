@@ -1,16 +1,16 @@
 {
   "name":        "hubot-hipchat-adapter",
   "version":     "1.0.0",
-  "author":      "Everybody",
+  "author":      "hipchat",
   "keywords":    "github hubot hipchat adapter",
   "description": "A Hipchat adapter for hubot",
   "licenses":     [{
     "type":       "MIT",
-    "url":        "http://github.com/warorface/hubot-hipchat/raw/master/LICENSE"
+    "url":        "http://github.com/hipchat/hubot-hipchat/raw/master/LICENSE"
   }],
   "repository" : {
     "type" : "git",
-    "url" : "http://github.com/warorface/hubot-hipchat.git"
+    "url" : "http://github.com/hipchat/hubot-hipchat.git"
   },
   "dependencies": {
     "hubot": ">= 2.0.0",
