@@ -59,16 +59,16 @@ class HipChat extends Adapter
         console.log "Received error from HipChat:", message
 
     bot.onMessage (channel, from, message) ->
-      author = self.userForName from
+      author = (self.userForName from) or {}
       author.name = from unless author.name
       author.reply_to = channel
-      hubot_msg = message.replace(mention, "#{self.name}: ")
+      hubot_msg = message.replace(mention, "#{self.robot.name}: ")
       self.receive new Robot.TextMessage(author, hubot_msg)
 
     bot.onPrivateMessage (from, message) =>
       author = self.userForId(from.match(/_(\d+)@/)[1])
       author.reply_to = from
-      self.receive new Robot.TextMessage(author, "#{self.name}: #{message}")
+      self.receive new Robot.TextMessage(author, "#{self.robot.name}: #{message}")
 
     bot.connect()
 
