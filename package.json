@@ -1,5 +1,5 @@
 {
-  "name":        "hubot-hipchat-adapter",
+  "name":        "hubot-hipchat",
   "version":     "1.0.0",
   "author":      "hipchat",
   "keywords":    "github hubot hipchat adapter",
