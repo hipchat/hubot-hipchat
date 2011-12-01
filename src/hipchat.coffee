@@ -21,9 +21,10 @@ class HipChat extends Adapter
       name:     process.env.HUBOT_HIPCHAT_NAME or "#{self.name} Bot"
       password: process.env.HUBOT_HIPCHAT_PASSWORD
       rooms:    process.env.HUBOT_HIPCHAT_ROOMS or "@All"
+      debug:    process.env.HUBOT_HIPCHAT_DEBUG or false
 
     console.log "Options:", @options
-    bot = new Wobot(jid: @options.jid, name: @options.name, password: @options.password)
+    bot = new Wobot(jid: @options.jid, name: @options.name, password: @options.password, debug: @options.debug == 'true')
     mention = new RegExp("@#{@options.name.split(' ')[0]}\\b", "i")
     console.log mention
     console.log "Bot:", bot
