@@ -13,7 +13,6 @@
     "url" : "http://github.com/hipchat/hubot-hipchat.git"
   },
   "dependencies": {
-    "hubot": ">= 2.0.0",
     "wobot": "0.3.1"
   },
   "devDependencies": {
