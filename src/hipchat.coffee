@@ -22,9 +22,10 @@ class HipChat extends Adapter
       password: process.env.HUBOT_HIPCHAT_PASSWORD
       rooms:    process.env.HUBOT_HIPCHAT_ROOMS or "@All"
       debug:    process.env.HUBOT_HIPCHAT_DEBUG or false
+      host:     process.env.HUBOT_HIPCHAT_HOST or null
 
     console.log "Options:", @options
-    bot = new Wobot(jid: @options.jid, name: @options.name, password: @options.password, debug: @options.debug == 'true')
+    bot = new Wobot(jid: @options.jid, name: @options.name, password: @options.password, debug: @options.debug == 'true', host: @options.host)
     mention = new RegExp("@#{@options.name.split(' ')[0]}\\b", "i")
     console.log mention
     console.log "Bot:", bot
@@ -84,11 +85,12 @@ class HipChat extends Adapter
 
   request: (method, path, body, callback) ->
     console.log method, path, body
-    headers = "Host": "api.hipchat.com"
+    host = @options.host or "api.hipchat.com"
+    headers = "Host": host
 
     options =
       "agent"  : false
-      "host"   : "api.hipchat.com"
+      "host"   : host
       "port"   : 443
       "path"   : path
       "method" : method
