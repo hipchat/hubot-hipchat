@@ -33,15 +33,10 @@ you will need to use `-a hipchat` when running your hubot.
 
 The HipChat adapter requires the following environment variables.
 
-* `HUBOT_HIPCHAT_TOKEN`
 * `HUBOT_HIPCHAT_JID`
 * `HUBOT_HIPCHAT_NAME`
 * `HUBOT_HIPCHAT_PASSWORD`
 * `HUBOT_HIPCHAT_ROOMS`
-
-### HipChat Token
-
-This is the "SHA-soup" that your HipChat admin can generate for your hubot's HipChat account.
 
 ### HipChat JID
 
@@ -62,7 +57,6 @@ to join. You can leave this blank to have your hubot join every room.
 
 ### Configuring the variables on Heroku
 
-    % heroku config:add HUBOT_HIPCHAT_TOKEN="..."
     % heroku config:add HUBOT_HIPCHAT_JID="..."
     % heroku config:add HUBOT_HIPCHAT_NAME="..."
     % heroku config:add HUBOT_HIPCHAT_PASSWORD="..."
@@ -70,7 +64,6 @@ to join. You can leave this blank to have your hubot join every room.
 
 ### Configuring the variables on UNIX
 
-    % export HUBOT_HIPCHAT_TOKEN="..."
     % export HUBOT_HIPCHAT_JID="..."
     % export HUBOT_HIPCHAT_NAME="..."
     % export HUBOT_HIPCHAT_PASSWORD="..."

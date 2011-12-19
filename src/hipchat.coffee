@@ -16,10 +16,10 @@ class HipChat extends Adapter
   run: ->
     self = @
     @options =
-      token:    process.env.HUBOT_HIPCHAT_TOKEN
       jid:      process.env.HUBOT_HIPCHAT_JID
-      name:     process.env.HUBOT_HIPCHAT_NAME or "#{self.name} Bot"
       password: process.env.HUBOT_HIPCHAT_PASSWORD
+      token:    process.env.HUBOT_HIPCHAT_TOKEN or null
+      name:     process.env.HUBOT_HIPCHAT_NAME or "#{self.name} Bot"
       rooms:    process.env.HUBOT_HIPCHAT_ROOMS or "@All"
       debug:    process.env.HUBOT_HIPCHAT_DEBUG or false
       host:     process.env.HUBOT_HIPCHAT_HOST or null
@@ -32,23 +32,26 @@ class HipChat extends Adapter
 
     bot.onConnect =>
       console.log "Connected to HipChat"
+
+      # Join requested rooms
       if @options.rooms is "@All"
-        @get "/v1/rooms/list", (err, response) ->
-          if response
-            for room in response.rooms
-              console.log "Joining #{room.xmpp_jid}"
-              bot.join room.xmpp_jid
+        bot.getRooms (err, rooms, stanza) ->
+          if rooms
+            for room in rooms
+              console.log "Joining #{room.jid}"
+              bot.join room.jid
           else
             console.log "Can't list rooms: #{err}"
       else
-        for room_id in @options.rooms.split(',')
-          console.log "Joining #{room_id}"
-          bot.join room_id
+        for room_jid in @options.rooms.split(',')
+          console.log "Joining #{room_jid}"
+          bot.join room_jid
 
-      @get "/v1/users/list", (err, response) ->
-        if response
-          for user in response.users
-            self.userForId user.user_id, user
+      # Fetch user info
+      bot.getRoster (err, users, stanza) ->
+        if users
+          for user in users
+            self.userForId self.userIdFromJid(user.jid), user
         else
           console.log "Can't list users: #{err}"
 
@@ -67,8 +70,8 @@ class HipChat extends Adapter
       hubot_msg = message.replace(mention, "#{self.robot.name}: ")
       self.receive new Robot.TextMessage(author, hubot_msg)
 
-    bot.onPrivateMessage (from, message) =>
-      author = self.userForId(from.match(/_(\d+)@/)[1])
+    bot.onPrivateMessage (from, message) ->
+      author = self.userForId(self.userIdFromJid(from))
       author.reply_to = from
       self.receive new Robot.TextMessage(author, "#{self.robot.name}: #{message}")
 
@@ -92,6 +95,10 @@ class HipChat extends Adapter
     console.log method, path, body
     host = @options.host or "api.hipchat.com"
     headers = "Host": host
+
+    unless @options.token
+      callback "No API token provided to Hubot", null
+      return
 
     options =
       "agent"  : false
@@ -117,14 +124,14 @@ class HipChat extends Adapter
         data += chunk
       response.on "end", ->
         if response.statusCode >= 400
-          console.log "hipchat error: #{response.statusCode}"
+          console.log "HipChat API error: #{response.statusCode}"
 
         try
           callback null, JSON.parse(data)
         catch err
           callback null, data or { }
       response.on "error", (err) ->
-        callback err, { }
+        callback err, null
 
     if method is "POST"
       request.end(body, 'binary')
@@ -135,6 +142,9 @@ class HipChat extends Adapter
       console.log err
       console.log err.stack
       callback err
+
+  userIdFromJid: (jid) ->
+    return jid.match(/_(\d+)@/)[1]
 
 exports.use = (robot) ->
   new HipChat robot
