@@ -72,6 +72,11 @@ class HipChat extends Adapter
       author.reply_to = from
       self.receive new Robot.TextMessage(author, "#{self.robot.name}: #{message}")
 
+    # Join rooms automatically when invited
+    bot.onInvite (room_jid, from_jid, message) =>
+      console.log "Got invite to #{room_jid} from #{from_jid} - joining"
+      bot.join room_jid
+
     bot.connect()
 
     @bot = bot
