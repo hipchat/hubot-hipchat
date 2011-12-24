@@ -67,12 +67,14 @@ class HipChat extends Adapter
       author = (self.userForName from) or {}
       author.name = from unless author.name
       author.reply_to = channel
+      author.room = self.roomNameFromJid(from)
       hubot_msg = message.replace(mention, "#{self.robot.name}: ")
       self.receive new Robot.TextMessage(author, hubot_msg)
 
     bot.onPrivateMessage (from, message) ->
       author = self.userForId(self.userIdFromJid(from))
       author.reply_to = from
+      author.room = self.roomNameFromJid(from)
       self.receive new Robot.TextMessage(author, "#{self.robot.name}: #{message}")
 
     # Join rooms automatically when invited
@@ -145,6 +147,9 @@ class HipChat extends Adapter
 
   userIdFromJid: (jid) ->
     return jid.match(/_(\d+)@/)[1]
+
+  roomNameFromJid: (jid) ->
+    return jid.match(/_(\w+)@/)[1]
 
 exports.use = (robot) ->
   new HipChat robot
