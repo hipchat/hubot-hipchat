@@ -67,7 +67,7 @@ class HipChat extends Adapter
       author = (self.userForName from) or {}
       author.name = from unless author.name
       author.reply_to = channel
-      author.room = self.roomNameFromJid(from)
+      author.room = self.roomNameFromJid(channel)
       hubot_msg = message.replace(mention, "#{self.robot.name}: ")
       self.receive new Robot.TextMessage(author, hubot_msg)
 
@@ -146,10 +146,18 @@ class HipChat extends Adapter
       callback err
 
   userIdFromJid: (jid) ->
-    return jid.match(/_(\d+)@/)[1]
+    try
+      return jid.match(/^\d+_(\d+)@/)[1]
+    catch e
+      console.log "Bad user JID: #{jid}"
+      return null
 
   roomNameFromJid: (jid) ->
-    return jid.match(/^\d+_([\w_\.]+)@/)[1]
+    try
+      return jid.match(/^\d+_([\w_\.]+)@/)[1]
+    catch e
+      console.log "Bad room JID: #{jid}"
+      return null
 
 exports.use = (robot) ->
   new HipChat robot
