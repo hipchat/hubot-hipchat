@@ -149,7 +149,7 @@ class HipChat extends Adapter
     return jid.match(/_(\d+)@/)[1]
 
   roomNameFromJid: (jid) ->
-    return jid.match(/_(\w+)@/)[1]
+    return jid.match(/^\d+_([\w_\.]+)@/)[1]
 
 exports.use = (robot) ->
   new HipChat robot
