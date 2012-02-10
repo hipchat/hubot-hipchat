@@ -1,5 +1,5 @@
-Robot   = require('hubot').robot()
-Adapter = require('hubot').adapter()
+Robot   = require '../../../src/robot'
+Adapter = require '../../../src/adapter'
 
 HTTPS   = require 'https'
 Wobot   = require('wobot').Bot
