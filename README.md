@@ -32,6 +32,10 @@ This is a HipChat-specific version of the more general [instructions in the Hubo
         % heroku create --stack cedar
         % heroku rename our-company-hubot
 
+1. Note: If you're going to include the redis-brain.coffee plugin you'll need to add [Redis To Go](http://devcenter.heroku.com/articles/redistogo).
+
+        % heroku addons:add redistogo
+
 1. Configure it:
 
       Set the JID to the "Jabber ID" shown on your bot's [XMPP/Jabber account settings](https://www.hipchat.com/account/xmpp):
