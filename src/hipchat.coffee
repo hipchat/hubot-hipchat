@@ -85,6 +85,8 @@ class HipChat extends Adapter
     bot.connect()
 
     @bot = bot
+    
+    self.emit "connected"
 
   # Convenience HTTP Methods for posting on behalf of the token"d user
   get: (path, callback) ->
