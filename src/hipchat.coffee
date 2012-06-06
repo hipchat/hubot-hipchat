@@ -156,7 +156,7 @@ class HipChat extends Adapter
 
   roomNameFromJid: (jid) ->
     try
-      return jid.match(/^\d+_([\w_\.]+)@/)[1]
+      return jid.match(/^\d+_([\w_\.-]+)@/)[1]
     catch e
       console.log "Bad room JID: #{jid}"
       return null
