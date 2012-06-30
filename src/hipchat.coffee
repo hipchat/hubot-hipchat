@@ -26,7 +26,7 @@ class HipChat extends Adapter
 
     console.log "Options:", @options
     bot = new Wobot(jid: @options.jid, name: @options.name, password: @options.password, debug: @options.debug == 'true', host: @options.host)
-    mention = new RegExp("@#{@options.name.split(' ')[0]}\\b", "i")
+    mention = new RegExp("@#{@options.name.replace(' ', '')}\\b", "i")
     console.log mention
     console.log "Bot:", bot
 
