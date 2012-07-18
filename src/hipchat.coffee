@@ -1,8 +1,6 @@
-Robot   = require('hubot').robot()
-Adapter = require('hubot').adapter()
-
-HTTPS   = require 'https'
-Wobot   = require('wobot').Bot
+{Adapter,Robot} = require 'hubot'
+HTTPS           = require 'https'
+Wobot           = require('wobot').Bot
 
 class HipChat extends Adapter
   send: (user, strings...) ->
