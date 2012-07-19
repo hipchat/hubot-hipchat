@@ -1,4 +1,6 @@
-{Adapter,Robot} = require 'hubot'
+Robot   = require('hubot').Robot
+Adapter = require('hubot').Adapter
+TextMessage = require('hubot').TextMessage
 HTTPS           = require 'https'
 Wobot           = require('wobot').Bot
 
@@ -67,13 +69,13 @@ class HipChat extends Adapter
       author.reply_to = channel
       author.room = self.roomNameFromJid(channel)
       hubot_msg = message.replace(mention, "#{self.robot.name}: ")
-      self.receive new Robot.TextMessage(author, hubot_msg)
+      self.receive new TextMessage(author, hubot_msg)
 
     bot.onPrivateMessage (from, message) ->
       author = self.userForId(self.userIdFromJid(from))
       author.reply_to = from
       author.room = self.roomNameFromJid(from)
-      self.receive new Robot.TextMessage(author, "#{self.robot.name}: #{message}")
+      self.receive new TextMessage(author, "#{self.robot.name}: #{message}")
 
     # Join rooms automatically when invited
     bot.onInvite (room_jid, from_jid, message) =>
@@ -83,7 +85,7 @@ class HipChat extends Adapter
     bot.connect()
 
     @bot = bot
-    
+
     self.emit "connected"
 
   # Convenience HTTP Methods for posting on behalf of the token"d user
