@@ -5,12 +5,12 @@
 This is a HipChat-specific version of the more general [instructions in the Hubot wiki](https://github.com/github/hubot/wiki/Deploying-Hubot-onto-Heroku).
 
 1. Create a [new HipChat account](https://www.hipchat.com/help/page/how-do-i-invite-other-users/) for your bot to use. Stay signed in to the account - we'll need to access its account settings later. We'll assume the bot's name is "Hubot Botson" in these instructions.
-1. Download the latest Hubot archive from https://github.com/github/hubot/downloads
+1. Download the latest Hubot package from http://hubot.github.com/
 1. Extract it
 1. Edit `hubot/packages.json` and add `hubot-hipchat` to the `dependencies` section. It should look something like this:
 
         "dependencies": {
-          "hubot-hipchat": ">= 1.0.9",
+          "hubot-hipchat": ">= 1.0.8",
           "hubot": ">= 2.3.0",
           ...
         }
