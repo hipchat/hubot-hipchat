@@ -7,10 +7,10 @@ This is a HipChat-specific version of the more general [instructions in the Hubo
 1. Create a [new HipChat account](https://www.hipchat.com/help/page/how-do-i-invite-other-users/) for your bot to use. Stay signed in to the account - we'll need to access its account settings later. We'll assume the bot's name is "Hubot Botson" in these instructions.
 1. Download the latest Hubot package from http://hubot.github.com/
 1. Extract it
-1. Edit `hubot/packages.json` and add `hubot-hipchat` to the `dependencies` section. It should look something like this:
+1. Edit `hubot/package.json` and add `hubot-hipchat` to the `dependencies` section. It should look something like this:
 
         "dependencies": {
-          "hubot-hipchat": ">= 1.0.8",
+          "hubot-hipchat": ">= 1.0.9",
           "hubot": ">= 2.3.0",
           ...
         }
@@ -65,6 +65,19 @@ This is a HipChat-specific version of the more general [instructions in the Hubo
 
 Bonus: Add a notification hook to Heroku so a notification is sent to a room whenever the bot is updated: https://www.hipchat.com/help/page/heroku-integration
 
+## Troubleshooting
+
+If you get errors when pushing to master regarding your node or npm version insert something like the following before the `dependencies` section in `package.json`:
+
+```json
+"engines": {                                                                                                                                                                                                                                
+    "node": "0.6.x",                                                                                                                                                                                                                          
+    "npm": "1.1.x"                                                                                                                                                                                                                            
+  },
+```
+
+NOTE: your version numbers may vary.
+
 ## Adapter configuration
 
 This adapter uses the following environment variables:
@@ -76,6 +89,8 @@ This is your bot's Jabber ID which can be found in your [XMPP/Jabber account set
 ### HUBOT\_HIPCHAT\_NAME
 
 This is the full name exactly as you see it on the HipChat account for your bot. For example, "Hubot Botson". It must match the name set on the HipChat account or it will be unable to join rooms.
+
+If you use a first and last name you may have to change the mention name in the user's hipchat preferences (ie - HubotBoston).
 
 ### HUBOT\_HIPCHAT\_PASSWORD
 
