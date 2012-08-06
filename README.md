@@ -38,6 +38,13 @@ This is a HipChat-specific version of the more general [instructions in the Hubo
 
 1. Configure it:
 
+You will need to set a configuration variable if you are hosting on the free
+Heroku plan.
+
+    % heroku config:add HEROKU_URL=http://soothing-mists-4567.herokuapp.com
+
+Where the URL is your Heroku app's URL.
+
       Set the JID to the "Jabber ID" shown on your bot's [XMPP/Jabber account settings](https://www.hipchat.com/account/xmpp):
 
         % heroku config:add HUBOT_HIPCHAT_JID="..."
@@ -54,6 +61,15 @@ This is a HipChat-specific version of the more general [instructions in the Hubo
 
         % git push heroku master
         % heroku ps:scale app=1
+
+This will tell Heroku to run 1 of the `app` process type which is described in
+the `Procfile`.
+
+If you're running an adapter that changes the `app` to `web` you need need to
+run the following instead of the above command.
+
+    % heroku ps:scale web=1
+
 
 1. You should see the bot join all rooms it has access to. If not, check the output of `heroku logs`. You can also use `heroku config` to check the config vars and `heroku restart` to restart the bot. `heroku ps` will show you its current process state.
 
