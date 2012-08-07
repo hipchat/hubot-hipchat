@@ -40,7 +40,7 @@ This is a HipChat-specific version of the more general [instructions in the Hubo
 
       You will need to set a configuration variable if you are hosting on the free Heroku plan.
 
-      % heroku config:add HEROKU_URL=http://soothing-mists-4567.herokuapp.com
+        % heroku config:add HEROKU_URL=http://soothing-mists-4567.herokuapp.com
 
       Where the URL is your Heroku app's URL.
 
@@ -61,9 +61,9 @@ This is a HipChat-specific version of the more general [instructions in the Hubo
         % git push heroku master
         % heroku ps:scale app=1
 
-        This will tell Heroku to run 1 of the `app` process type which is described in the `Procfile`.
+      This will tell Heroku to run 1 of the `app` process type which is described in the `Procfile`.
 
-        If you're running an adapter that changes the `app` to `web` you need need to run the following instead of the above command.
+      If you're running an adapter that changes the `app` to `web` you need need to run the following instead of the above command.
 
         % heroku ps:scale web=1
 
