@@ -1,6 +1,6 @@
 {
   "name":        "hubot-hipchat",
-  "version":     "1.0.10",
+  "version":     "1.0.11",
   "author":      "hipchat",
   "keywords":    "github hubot hipchat adapter",
   "description": "A Hipchat adapter for hubot",
@@ -14,7 +14,7 @@
   },
   "dependencies": {
     "node-expat": "1.6.1",
-    "wobot": "0.6.0"
+    "wobot": "0.8.0"
   },
   "devDependencies": {
     "coffee-script": "1.1.3"
