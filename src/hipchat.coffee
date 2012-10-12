@@ -1,8 +1,8 @@
 Robot   = require('hubot').Robot
 Adapter = require('hubot').Adapter
 TextMessage = require('hubot').TextMessage
-HTTPS           = require 'https'
-Wobot           = require('wobot').Bot
+HTTPS = require 'https'
+Wobot = require('wobot').Bot
 
 class HipChat extends Adapter
   send: (user, strings...) ->
@@ -25,7 +25,13 @@ class HipChat extends Adapter
       host:     process.env.HUBOT_HIPCHAT_HOST or null
 
     console.log "Options:", @options
-    bot = new Wobot(jid: @options.jid, name: @options.name, password: @options.password, debug: @options.debug == 'true', host: @options.host)
+    bot = new Wobot(
+      jid: @options.jid,
+      name: @options.name,
+      password: @options.password,
+      debug: @options.debug == 'true',
+      host: @options.host
+    )
     mention = new RegExp("@#{@options.name.replace(' ', '')}\\b", "i")
     console.log mention
     console.log "Bot:", bot
