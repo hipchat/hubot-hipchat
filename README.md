@@ -91,7 +91,7 @@ This is the password for your bot's HipChat account.
 
 ### HUBOT\_HIPCHAT\_ROOMS
 
-Optional. This is a comma separated list of room JIDs that you want your bot to join. You can leave this blank or set it to "@All" to have your bot join every room. Room JIDs look like "123_development@conf.hipchat.com" and can be found in the [XMPP/Jabber account settings](https://www.hipchat.com/account/xmpp) - just add "@conf.hipchat.com" to the end of the room's "XMPP/Jabber Name".
+Optional. This is a comma separated list of room JIDs that you want your bot to join. You can leave this blank or set it to "All" to have your bot join every room. Room JIDs look like "123_development@conf.hipchat.com" and can be found in the [XMPP/Jabber account settings](https://www.hipchat.com/account/xmpp) - just add "@conf.hipchat.com" to the end of the room's "XMPP/Jabber Name".
 
 ### HUBOT\_HIPCHAT\_DEBUG
 

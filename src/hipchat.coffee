@@ -20,7 +20,7 @@ class HipChat extends Adapter
       password: process.env.HUBOT_HIPCHAT_PASSWORD
       token:    process.env.HUBOT_HIPCHAT_TOKEN or null
       name:     process.env.HUBOT_HIPCHAT_NAME or "#{self.name} Bot"
-      rooms:    process.env.HUBOT_HIPCHAT_ROOMS or "@All"
+      rooms:    process.env.HUBOT_HIPCHAT_ROOMS or "All"
       debug:    process.env.HUBOT_HIPCHAT_DEBUG or false
       host:     process.env.HUBOT_HIPCHAT_HOST or null
 
@@ -34,7 +34,7 @@ class HipChat extends Adapter
       console.log "Connected to HipChat"
 
       # Join requested rooms
-      if @options.rooms is "@All"
+      if @options.rooms is "All"
         bot.getRooms (err, rooms, stanza) ->
           if rooms
             for room in rooms
