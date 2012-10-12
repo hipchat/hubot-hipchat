@@ -11,7 +11,7 @@ This is a HipChat-specific version of the more general [instructions in the Hubo
 
         "dependencies": {
           "hubot-hipchat": ">= 1.0.9",
-          "hubot": ">= 2.3.0",
+          "hubot": ">= 2.3.4",
           ...
         }
 
