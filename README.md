@@ -7,7 +7,7 @@ This is a HipChat-specific version of the more general [instructions in the Hubo
 1. Create a [new HipChat account](https://www.hipchat.com/help/page/how-do-i-invite-other-users/) for your bot to use. Stay signed in to the account - we'll need to access its account settings later. We'll assume the bot's name is "Hubot Botson" in these instructions.
 1. Download the latest Hubot archive from https://github.com/github/hubot/downloads
 1. Extract it
-1. Edit `hubot/packages.json` and add `hubot-hipchat` to the `dependencies` section. It should look something like this:
+1. Edit `hubot/package.json` and add `hubot-hipchat` to the `dependencies` section. It should look something like this:
 
         "dependencies": {
           "hubot-hipchat": ">= 1.0.9",
@@ -29,12 +29,12 @@ This is a HipChat-specific version of the more general [instructions in the Hubo
 1. Install the [Heroku command line tools](http://devcenter.heroku.com/articles/heroku-command) if you don't have them installed yet.
 1. Create a new Heroku application and (optionally) rename it:
 
-        % heroku create --stack cedar
+        % heroku create
         % heroku rename our-company-hubot
 
 1. Note: If you're going to include the redis-brain.coffee plugin you'll need to add [Redis To Go](http://devcenter.heroku.com/articles/redistogo).
 
-        % heroku addons:add redistogo
+        % heroku addons:add redistogo:nano
 
 1. Configure it:
 
@@ -42,7 +42,7 @@ This is a HipChat-specific version of the more general [instructions in the Hubo
 
         % heroku config:add HEROKU_URL=http://soothing-mists-4567.herokuapp.com
 
-      Where the URL is your Heroku app's URL.
+      Where the URL is your Heroku app's URL (shown after running `heroku create`, or `heroku rename`).
 
       Set the JID to the "Jabber ID" shown on your bot's [XMPP/Jabber account settings](https://www.hipchat.com/account/xmpp):
 
@@ -59,16 +59,11 @@ This is a HipChat-specific version of the more general [instructions in the Hubo
 1. Deploy and start the bot:
 
         % git push heroku master
-        % heroku ps:scale app=1
-
-      This will tell Heroku to run 1 of the `app` process type which is described in the `Procfile`.
-
-      If you're running an adapter that changes the `app` to `web` you need need to run the following instead of the above command.
-
         % heroku ps:scale web=1
 
+      This will tell Heroku to run 1 of the `web` process type which is described in the `Procfile`.
 
-1. You should see the bot join all rooms it has access to. If not, check the output of `heroku logs`. You can also use `heroku config` to check the config vars and `heroku restart` to restart the bot. `heroku ps` will show you its current process state.
+1. You should see the bot join all rooms it has access to (or are specified in HUBOT\_HIPCHAT\_ROOMS, see below). If not, check the output of `heroku logs`. You can also use `heroku config` to check the config vars and `heroku restart` to restart the bot. `heroku ps` will show you its current process state.
 
 1. Assuming your bot's name is "Hubot", the bot will respond to commands like "@hubot help". It will also respond in 1-1 chat ("@hubot" must be omitted there, so just use "help" for example).
 
