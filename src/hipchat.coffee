@@ -19,25 +19,28 @@ class HipChat extends Adapter
       jid:      process.env.HUBOT_HIPCHAT_JID
       password: process.env.HUBOT_HIPCHAT_PASSWORD
       token:    process.env.HUBOT_HIPCHAT_TOKEN or null
-      name:     process.env.HUBOT_HIPCHAT_NAME or "#{self.name} Bot"
       rooms:    process.env.HUBOT_HIPCHAT_ROOMS or "All"
       debug:    process.env.HUBOT_HIPCHAT_DEBUG or false
       host:     process.env.HUBOT_HIPCHAT_HOST or null
+    console.log "HipChat adapter options:", @options
 
-    console.log "Options:", @options
+    # create Wobot bot object
     bot = new Wobot(
       jid: @options.jid,
-      name: @options.name,
       password: @options.password,
       debug: @options.debug == 'true',
       host: @options.host
     )
-    mention = new RegExp("@#{@options.name.replace(' ', '')}\\b", "i")
-    console.log mention
-    console.log "Bot:", bot
+    console.log "Wobot object:", bot
 
     bot.onConnect =>
-      console.log "Connected to HipChat"
+      console.log "Connected to HipChat as @#{bot.mention_name}!"
+
+      # Provide our name to Hubot
+      self.robot.name = bot.mention_name
+
+      # Tell Hubot we're connected so it can load scripts
+      self.emit "connected"
 
       # Join requested rooms
       if @options.rooms is "All"
@@ -74,14 +77,15 @@ class HipChat extends Adapter
       author.name = from unless author.name
       author.reply_to = channel
       author.room = self.roomNameFromJid(channel)
-      hubot_msg = message.replace(mention, "#{self.robot.name}: ")
+      regex = new RegExp("@#{bot.mention_name}\\b", "i")
+      hubot_msg = message.replace(regex, "#{bot.mention_name}: ")
       self.receive new TextMessage(author, hubot_msg)
 
     bot.onPrivateMessage (from, message) ->
       author = self.userForId(self.userIdFromJid(from))
       author.reply_to = from
       author.room = self.roomNameFromJid(from)
-      self.receive new TextMessage(author, "#{self.robot.name}: #{message}")
+      self.receive new TextMessage(author, "#{bot.mention_name}: #{message}")
 
     # Join rooms automatically when invited
     bot.onInvite (room_jid, from_jid, message) =>
@@ -92,7 +96,19 @@ class HipChat extends Adapter
 
     @bot = bot
 
-    self.emit "connected"
+  userIdFromJid: (jid) ->
+    try
+      return jid.match(/^\d+_(\d+)@/)[1]
+    catch e
+      console.log "Bad user JID: #{jid}"
+      return null
+
+  roomNameFromJid: (jid) ->
+    try
+      return jid.match(/^\d+_([\w_\.-]+)@/)[1]
+    catch e
+      console.log "Bad room JID: #{jid}"
+      return null
 
   # Convenience HTTP Methods for posting on behalf of the token"d user
   get: (path, callback) ->
@@ -152,20 +168,6 @@ class HipChat extends Adapter
       console.log err
       console.log err.stack
       callback err
-
-  userIdFromJid: (jid) ->
-    try
-      return jid.match(/^\d+_(\d+)@/)[1]
-    catch e
-      console.log "Bad user JID: #{jid}"
-      return null
-
-  roomNameFromJid: (jid) ->
-    try
-      return jid.match(/^\d+_([\w_\.-]+)@/)[1]
-    catch e
-      console.log "Bad room JID: #{jid}"
-      return null
 
 exports.use = (robot) ->
   new HipChat robot

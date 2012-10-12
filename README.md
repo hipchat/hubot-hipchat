@@ -15,9 +15,9 @@ This is a HipChat-specific version of the more general [instructions in the Hubo
           ...
         }
 
-1. Edit `Procfile` and change it to use the `hipchat` adapter. If your bot's first name is not "Hubot" you'll want to edit the name here as well:
+1. Edit `Procfile` and change it to use the `hipchat` adapter:
 
-        app: bin/hubot -a hipchat -n Hubot
+        app: bin/hubot --adapter hipchat
 
 1. Turn your `hubot` directory into a git repository:
 
@@ -48,10 +48,6 @@ This is a HipChat-specific version of the more general [instructions in the Hubo
 
         % heroku config:add HUBOT_HIPCHAT_JID="..."
 
-      Set the name to match the "Room nickname" value on the same page:
-
-        % heroku config:add HUBOT_HIPCHAT_NAME="..."
-
       Set the password to the password chosen when you created the bot's account.
 
         % heroku config:add HUBOT_HIPCHAT_PASSWORD="..."
@@ -81,10 +77,6 @@ This adapter uses the following environment variables:
 
 This is your bot's Jabber ID which can be found in your [XMPP/Jabber account settings](https://www.hipchat.com/account/xmpp). It will look something like `123_456@chat.hipchat.com`
 
-### HUBOT\_HIPCHAT\_NAME
-
-This is the full name exactly as you see it on the HipChat account for your bot. For example, "Hubot Botson". It must match the name set on the HipChat account or it will be unable to join rooms.
-
 ### HUBOT\_HIPCHAT\_PASSWORD
 
 This is the password for your bot's HipChat account.
@@ -106,12 +98,11 @@ Optional. Use to force the host to open the XMPP connection to.
 To run locally on OSX or Linux you'll need to set the required environment variables and run the `bin/hubot` script. An example script to run the bot might look like:
 
     #!/bin/bash
-    
+
     export HUBOT_HIPCHAT_JID="..."
-    export HUBOT_HIPCHAT_NAME="..."
     export HUBOT_HIPCHAT_PASSWORD="..."
-    
-    ~/hubot/bin/hubot -a hipchat -n Hubot
+
+    ~/hubot/bin/hubot --adapter hipchat
 
 ### OSX note
 
