@@ -1,9 +1,16 @@
 {
   "name":        "hubot-hipchat",
   "version":     "1.1.0",
-  "author":      "hipchat",
-  "keywords":    "github hubot hipchat adapter",
-  "description": "A Hipchat adapter for hubot",
+  "author":      "HipChat <support@hipchat.com>",
+  "description": "A Hipchat adapter for Hubot",
+  "keywords": [
+    "hipchat",
+    "hubot",
+    "xmpp",
+    "wobot",
+    "chat",
+    "bot"
+  ],
   "licenses":     [{
     "type":       "MIT",
     "url":        "http://github.com/hipchat/hubot-hipchat/raw/master/LICENSE"
@@ -16,5 +23,6 @@
     "node-expat": "1.6.1",
     "wobot": "0.8.0"
   },
+  "license": "MIT",
   "main": "./src/hipchat"
 }
