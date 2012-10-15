@@ -17,7 +17,7 @@ This is a HipChat-specific version of the more general [instructions in the Hubo
 
 1. Edit `Procfile` and change it to use the `hipchat` adapter:
 
-        app: bin/hubot --adapter hipchat
+        web: bin/hubot --adapter hipchat
 
 1. Turn your `hubot` directory into a git repository:
 
