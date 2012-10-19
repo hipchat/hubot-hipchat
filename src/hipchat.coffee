@@ -43,7 +43,7 @@ class HipChat extends Adapter
       self.emit "connected"
 
       # Join requested rooms
-      if @options.rooms is "All"
+      if @options.rooms is "All" or @options.rooms is '@All'
         bot.getRooms (err, rooms, stanza) ->
           if rooms
             for room in rooms
