@@ -77,14 +77,25 @@ class HipChat extends Adapter
       author.name = from unless author.name
       author.reply_to = channel
       author.room = self.roomNameFromJid(channel)
-      regex = new RegExp("@#{bot.mention_name}\\b", "i")
+
+      # reformat leading @mention name to be like "name: message" which is
+      # what hubot expects
+      regex = new RegExp("^@#{bot.mention_name}\\b", "i")
       hubot_msg = message.replace(regex, "#{bot.mention_name}: ")
+
       self.receive new TextMessage(author, hubot_msg)
 
     bot.onPrivateMessage (from, message) ->
       author = self.userForId(self.userIdFromJid(from))
       author.reply_to = from
-      self.receive new TextMessage(author, "#{bot.mention_name}: #{message}")
+
+      # remove leading @mention name if present and format the message like
+      # "name: message" which is what hubot expects
+      regex = new RegExp("^@#{bot.mention_name}\\b", "i")
+      message = message.replace(regex, "")
+      hubot_msg = "#{bot.mention_name}: #{message}"
+
+      self.receive new TextMessage(author, hubot_msg)
 
     # Join rooms automatically when invited
     bot.onInvite (room_jid, from_jid, message) =>
