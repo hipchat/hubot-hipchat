@@ -84,7 +84,6 @@ class HipChat extends Adapter
     bot.onPrivateMessage (from, message) ->
       author = self.userForId(self.userIdFromJid(from))
       author.reply_to = from
-      author.room = self.roomNameFromJid(from)
       self.receive new TextMessage(author, "#{bot.mention_name}: #{message}")
 
     # Join rooms automatically when invited
@@ -98,14 +97,14 @@ class HipChat extends Adapter
 
   userIdFromJid: (jid) ->
     try
-      return jid.match(/^\d+_(\d+)@/)[1]
+      return jid.match(/^\d+_(\d+)@chat\./)[1]
     catch e
       console.log "Bad user JID: #{jid}"
       return null
 
   roomNameFromJid: (jid) ->
     try
-      return jid.match(/^\d+_([\w_\.-]+)@/)[1]
+      return jid.match(/^\d+_(.+)@conf\./)[1]
     catch e
       console.log "Bad room JID: #{jid}"
       return null
