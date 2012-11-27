@@ -11,7 +11,7 @@ class HipChat extends Adapter
 
   reply: (user, strings...) ->
     for str in strings
-      @send user, "@#{user.name.replace(' ', '')} #{str}"
+      @send user, "@#{user.mention_name} #{str}"
 
   run: ->
     self = @
