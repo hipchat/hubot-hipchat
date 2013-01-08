@@ -12,8 +12,11 @@ class HipChat extends Adapter
       @bot.message user.reply_to, str
 
   reply: (user, strings...) ->
-    for str in strings
-      @send user, "@#{user.mention_name} #{str}"
+    if user.mention_name?
+      for str in strings
+        @send user, "@#{user.mention_name} #{str}"
+    else
+      @send user, strings
 
   run: ->
     self = @
