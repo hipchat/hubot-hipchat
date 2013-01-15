@@ -5,15 +5,44 @@ HTTPS = require 'https'
 Wobot = require('wobot').Bot
 
 class HipChat extends Adapter
-  send: (user, strings...) ->
-    if !user.reply_to and user.room
-      user.reply_to = user.room
-    for str in strings
-      @bot.message user.reply_to, str
+  send: (envelope, strings...) ->
+    user = null
+    room = null
+    target_jid = null
 
-  reply: (user, strings...) ->
+    # as of hubot 2.4.2, the first param to send() is an object with 'user'
+    # and 'room' data inside. detect the old style here.
+    if envelope.reply_to
+      user = envelope
+    else
+      # expand envelope
+      user = envelope.user
+      room = envelope.room
+
+    if user
+      # most common case - we're replying to a user in a room or 1-1
+      if user.reply_to
+        target_jid = user.reply_to
+      # allows user objects to be passed in
+      else if user.jid
+        target_jid = user.jid
+      # allows user to be a jid string
+      else if user.search /@/ != -1
+        target_jid = user
+    else if room
+      # this will happen if someone uses robot.messageRoom(jid, ...)
+      target_jid = room
+
+    if not target_jid
+      console.log "ERROR: Not sure who to send to. envelope=", envelope
+      return
+
     for str in strings
-      @send user, "@#{user.mention_name} #{str}"
+      @bot.message target_jid, str
+
+  reply: (envelope, strings...) ->
+    for str in strings
+      @send envelope, "@#{user.mention_name} #{str}"
 
   run: ->
     self = @
@@ -75,10 +104,17 @@ class HipChat extends Adapter
         console.log "Received error from HipChat:", message
 
     bot.onMessage (channel, from, message) ->
-      author = (self.userForName from) or {}
-      author.name = from unless author.name
+      author = {}
+      author.name = from
       author.reply_to = channel
       author.room = self.roomNameFromJid(channel)
+
+      # add extra details if this message is from a known user
+      author_data = self.userForName(from)
+      if author_data
+        author.name = author_data.name
+        author.mention_name = author_data.mention_name
+        author.jid = author_data.jid
 
       # reformat leading @mention name to be like "name: message" which is
       # what hubot expects
@@ -88,8 +124,15 @@ class HipChat extends Adapter
       self.receive new TextMessage(author, hubot_msg)
 
     bot.onPrivateMessage (from, message) ->
-      author = self.userForId(self.userIdFromJid(from))
+      author = {}
       author.reply_to = from
+
+      # add extra details if this message is from a known user
+      author_data = self.userForId(self.userIdFromJid(from))
+      if author_data
+        author.name = author_data.name
+        author.mention_name = author_data.mention_name
+        author.jid = author_data.jid
 
       # remove leading @mention name if present and format the message like
       # "name: message" which is what hubot expects
