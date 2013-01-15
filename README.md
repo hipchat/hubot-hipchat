@@ -16,7 +16,7 @@ This is a HipChat-specific version of the more general [instructions in the Hubo
 1. Edit `hubot/package.json` and add `hubot-hipchat` to the `dependencies` section. It should look something like this:
 
         "dependencies": {
-          "hubot-hipchat": ">= 2.4.2",
+          "hubot-hipchat": ">= 2.4.5",
           ...
         }
 
