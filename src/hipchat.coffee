@@ -41,6 +41,7 @@ class HipChat extends Adapter
       @bot.message target_jid, str
 
   reply: (envelope, strings...) ->
+    user = if envelope.user then envelope.user else envelope
     for str in strings
       @send envelope, "@#{user.mention_name} #{str}"
 
