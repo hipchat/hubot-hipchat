@@ -1,7 +1,7 @@
 {
-  "name":        "hubot-hipchat",
-  "version":     "2.4.5",
-  "author":      "HipChat <support@hipchat.com>",
+  "name": "hubot-hipchat",
+  "version": "2.4.5-1",
+  "author": "HipChat <support@hipchat.com>",
   "description": "A Hipchat adapter for Hubot",
   "keywords": [
     "hipchat",
@@ -11,13 +11,15 @@
     "chat",
     "bot"
   ],
-  "licenses":     [{
-    "type":       "MIT",
-    "url":        "http://github.com/hipchat/hubot-hipchat/raw/master/LICENSE"
-  }],
-  "repository" : {
-    "type" : "git",
-    "url" : "http://github.com/hipchat/hubot-hipchat.git"
+  "licenses": [
+    {
+      "type": "MIT",
+      "url": "http://github.com/hipchat/hubot-hipchat/raw/master/LICENSE"
+    }
+  ],
+  "repository": {
+    "type": "git",
+    "url": "http://github.com/hipchat/hubot-hipchat.git"
   },
   "dependencies": {
     "node-expat": "1.6.1",
