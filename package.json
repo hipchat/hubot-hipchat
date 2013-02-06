@@ -22,7 +22,7 @@
     "url": "http://github.com/hipchat/hubot-hipchat.git"
   },
   "dependencies": {
-    "node-expat": "1.6.1",
+    "node-expat": "2.0.0",
     "wobot": "0.8.0"
   },
   "license": "MIT",
