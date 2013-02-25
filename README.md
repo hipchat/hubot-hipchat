@@ -13,8 +13,11 @@ This is a HipChat-specific version of the more general [instructions in the Hubo
         % npm install
         % make package
 
-1. The `hubot/` directory that was just created is all that is relevant to us now. You can move it, rename it, make it into a git repo, etc.
-1. Edit `hubot/package.json` and add `hubot-hipchat` to the `dependencies` section. It should look something like this:
+1. The `hubot/` directory that was just created is all that is relevant to us now. Let's switch to it:
+
+        % cd hubot/
+
+1. Edit `package.json` and add `hubot-hipchat` to the `dependencies` section. It should look something like this:
 
         "dependencies": {
           "hubot-hipchat": ">= 2.4.5",
@@ -27,7 +30,6 @@ This is a HipChat-specific version of the more general [instructions in the Hubo
 
 1. Turn your `hubot` directory into a git repository:
 
-        % cd hubot/
         % git init
         % git add .
         % git commit -m "Initial commit"
