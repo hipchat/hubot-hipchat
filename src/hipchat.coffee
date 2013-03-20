@@ -16,7 +16,7 @@ class HipChat extends Adapter
       user = envelope
     else
       # expand envelope
-      user = envelope.user
+      user = envelope.user or envelope.message.message.user
       room = envelope.room
 
     if user
