@@ -186,19 +186,13 @@ class HipChat extends Adapter
       "agent"  : false
       "host"   : host
       "port"   : 443
-      "path"   : path
+      "path"   : path += "?auth_token=#{@options.token}"
       "method" : method
       "headers": headers
 
     if method is "POST"
-      body.auth_token = @options.token
-      body = JSON.stringify(body)
-      headers["Content-Type"] = "application/json"
-
-      body = new Buffer(body)
+      headers["Content-Type"] = "application/x-www-form-urlencoded"
       options.headers["Content-Length"] = body.length
-    else
-      options.path += "?auth_token=#{@options.token}"
 
     request = HTTPS.request options, (response) ->
       data = ""
