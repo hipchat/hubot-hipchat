@@ -97,6 +97,7 @@ class HipChat extends Adapter
           console.log "Can't list users: #{err}"
 
     bot.onError (message) ->
+      console.log message
       # If HipChat sends an error, we get the error message from XMPP.
       # Otherwise, we get an Error object from the Node connection.
       if message.message
