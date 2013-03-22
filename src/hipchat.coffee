@@ -58,7 +58,7 @@ class HipChat extends Adapter
 
     # create Wobot bot object
     bot = new Wobot(
-      jid: @options.jid,
+      jid: "#{@options.jid}@chat.hipchat.com/bot",
       password: @options.password,
       debug: @options.debug == 'true',
       host: @options.host
