@@ -69,7 +69,7 @@ class HipChat extends Adapter
       console.log "Connected to HipChat as @#{bot.mention_name}!"
 
       # Provide our name to Hubot
-      self.robot.name = bot.mention_name
+      self.robot.name = bot.mention_name.toLowerCase()
 
       # Tell Hubot we're connected so it can load scripts
       self.emit "connected"
