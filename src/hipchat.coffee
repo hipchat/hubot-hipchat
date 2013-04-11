@@ -54,6 +54,10 @@ class HipChat extends Adapter
       rooms:    process.env.HUBOT_HIPCHAT_ROOMS or "All"
       debug:    process.env.HUBOT_HIPCHAT_DEBUG or false
       host:     process.env.HUBOT_HIPCHAT_HOST or null
+    if process.env.HUBOT_HIPCHAT_JOIN_ROOMS_ON_INVITE is null
+      @options.join_rooms_on_invite = true
+    else
+      @options.join_rooms_on_invite = process.env.HUBOT_HIPCHAT_JOIN_ROOMS_ON_INVITE
     console.log "HipChat adapter options:", @options
 
     # create Wobot bot object
@@ -145,8 +149,12 @@ class HipChat extends Adapter
 
     # Join rooms automatically when invited
     bot.onInvite (room_jid, from_jid, message) =>
-      console.log "Got invite to #{room_jid} from #{from_jid} - joining"
-      bot.join room_jid
+      log_message = "Got invite to #{room_jid} from #{from_jid} -"
+      if @options.join_rooms_on_invite
+        console.log "#{log_message} - joining"
+        bot.join room_jid
+      else
+        console.log "#{log_message} not joining because HUBOT_HIPCHAT_JOIN_ROOMS_ON_INVITE is set to false"
 
     bot.connect()
 
