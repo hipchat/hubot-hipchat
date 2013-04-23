@@ -92,7 +92,7 @@ class HipChat extends Adapter
       bot.getRoster (err, users, stanza) ->
         if users
           for user in users
-            self.userForId self.userIdFromJid(user.jid), user
+            self.robot.brain.userForId self.userIdFromJid(user.jid), user
         else
           console.log "Can't list users: #{err}"
 
@@ -129,7 +129,7 @@ class HipChat extends Adapter
       author.reply_to = from
 
       # add extra details if this message is from a known user
-      author_data = self.userForId(self.userIdFromJid(from))
+      author_data = self.robot.brain.userForId(self.userIdFromJid(from))
       if author_data
         author.name = author_data.name
         author.mention_name = author_data.mention_name
