@@ -111,7 +111,7 @@ class HipChat extends Adapter
       author.room = self.roomNameFromJid(channel)
 
       # add extra details if this message is from a known user
-      author_data = self.userForName(from)
+      author_data = self.robot.brain.userForName(from)
       if author_data
         author.name = author_data.name
         author.mention_name = author_data.mention_name
