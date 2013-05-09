@@ -6,23 +6,35 @@ This is a HipChat-specific version of the more general [instructions in the Hubo
 
 1. Create a [new HipChat account](https://www.hipchat.com/help/page/how-do-i-invite-other-users/) for your bot to use. Stay signed in to the account - we'll need to access its account settings later.
 
-1. Download the latest Hubot package from https://github.com/github/hubot/archive/master.zip
-1. Extract it
-1. In a terminal, go to the extracted directory, and do this:
+1. Make sure native dependencies are installed:
+
+        (e.g. OS X with brew)
+        % brew install icu4c
+        % brew link icu4c
+
+        (e.g. Linux with apt-get)
+        % apt-get install libexpat1-dev
+        % apt-get install libicu-dev
+
+1. Install `hubot` from npm, if you don't already have it:
+
+        % npm install --global hubot
+
+1. Create a new `hubot` if necessary:
+
+        % hubot --create <path>
+
+1. Switch to the new `hubot` directory:
+
+        % cd <above path>
+
+1. Install `hubot` dependencies:
 
         % npm install
-        % make package
 
-1. The `hubot/` directory that was just created is all that is relevant to us now. Let's switch to it:
+1. Install the `hipchat` adapter:
 
-        % cd hubot/
-
-1. Edit `package.json` and add `hubot-hipchat` to the `dependencies` section. It should look something like this:
-
-        "dependencies": {
-          "hubot-hipchat": ">= 2.4.5",
-          ...
-        }
+        % npm install --save hubot-hipchat
 
 1. Edit `Procfile` and change it to use the `hipchat` adapter:
 
@@ -35,6 +47,7 @@ This is a HipChat-specific version of the more general [instructions in the Hubo
         % git commit -m "Initial commit"
 
 1. Install the [Heroku command line tools](http://devcenter.heroku.com/articles/heroku-command) if you don't have them installed yet.
+
 1. Create a new Heroku application and (optionally) rename it:
 
         % heroku create
@@ -93,13 +106,13 @@ This is the password for your bot's HipChat account.
 
 Optional. This is a comma separated list of room JIDs that you want your bot to join. You can leave this blank or set it to "All" to have your bot join every room. Room JIDs look like "123_development@conf.hipchat.com" and can be found in the [XMPP/Jabber account settings](https://www.hipchat.com/account/xmpp) - just add "@conf.hipchat.com" to the end of the room's "XMPP/Jabber Name".
 
-### HUBOT\_HIPCHAT\_DEBUG
-
-Optional. Set to true to enable some additional debug logging.
-
 ### HUBOT\_HIPCHAT\_HOST
 
 Optional. Use to force the host to open the XMPP connection to.
+
+### HUBOT\_LOG\_LEVEL
+
+Optional. Set to `debug` to enable detailed debug logging.
 
 ## Running locally
 
@@ -110,12 +123,4 @@ To run locally on OSX or Linux you'll need to set the required environment varia
     export HUBOT_HIPCHAT_JID="..."
     export HUBOT_HIPCHAT_PASSWORD="..."
 
-    ~/hubot/bin/hubot --adapter hipchat
-
-### OSX note
-
-This adapter requires `node-stringprep` which in turn, requires `icu-config` to be available in the path. You'll need to install `icu4c`, which, conveniently, homebrew can take care of for you:
-
-    % brew install icu4c
-
-But `brew` will not link any of the utilities, you'll have to do that by hand (in particular `icu-config` which is needed for `node-stringprep` to build correctly (it'll just appear like a broken package otherwise which will be really disturbing)). You can link it with brew using `brew link icu4c`.
+    bin/hubot --adapter hipchat
