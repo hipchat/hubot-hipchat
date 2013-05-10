@@ -62,12 +62,12 @@ module.exports = class Connector extends EventEmitter
 
     # add a JID resource if none was provided
     jid = new xmpp.JID options.jid
-    jid.resource = "hcbot" if not jid.resource
+    jid.resource = "hubot-hipchat" if not jid.resource
 
     @jid = jid.toString()
     @password = options.password
     @host = options.host
-    @caps_ver = options.caps_ver or "hcbot:#{pkg.version}"
+    @caps_ver = options.caps_ver or "hubot-hipchat:#{pkg.version}"
 
     # Multi-User-Conference (rooms) service host. Use when directing stanzas
     # to the MUC service.
