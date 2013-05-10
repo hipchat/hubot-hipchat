@@ -3,6 +3,8 @@ Adapter = require('hubot').Adapter
 TextMessage = require('hubot').TextMessage
 HTTPS = require 'https'
 Wobot = require('wobot').Bot
+Log = require('log')
+logger = new Log process.env.HUBOT_LOG_LEVEL or 'info'
 
 class HipChat extends Adapter
   send: (envelope, strings...) ->
@@ -34,7 +36,7 @@ class HipChat extends Adapter
       target_jid = room
 
     if not target_jid
-      console.log "ERROR: Not sure who to send to. envelope=", envelope
+      logger.error "ERROR: Not sure who to send to. envelope=", envelope
       return
 
     for str in strings
@@ -54,7 +56,7 @@ class HipChat extends Adapter
       rooms:    process.env.HUBOT_HIPCHAT_ROOMS or "All"
       debug:    process.env.HUBOT_HIPCHAT_DEBUG or false
       host:     process.env.HUBOT_HIPCHAT_HOST or null
-    console.log "HipChat adapter options:", @options
+    logger.debug "HipChat adapter options:", @options
 
     # create Wobot bot object
     bot = new Wobot(
@@ -63,10 +65,10 @@ class HipChat extends Adapter
       debug: @options.debug == 'true',
       host: @options.host
     )
-    console.log "Wobot object:", bot
+    logger.debug "Wobot object:", bot
 
     bot.onConnect =>
-      console.log "Connected to HipChat as @#{bot.mention_name}!"
+      logger.info "Connected to HipChat as @#{bot.mention_name}!"
 
       # Provide our name to Hubot
       self.robot.name = bot.mention_name
@@ -79,13 +81,13 @@ class HipChat extends Adapter
         bot.getRooms (err, rooms, stanza) ->
           if rooms
             for room in rooms
-              console.log "Joining #{room.jid}"
+              logger.info "Joining #{room.jid}"
               bot.join room.jid
           else
-            console.log "Can't list rooms: #{err}"
+            logger.error "Can't list rooms: #{err}"
       else
         for room_jid in @options.rooms.split(',')
-          console.log "Joining #{room_jid}"
+          logger.info "Joining #{room_jid}"
           bot.join room_jid
 
       # Fetch user info
@@ -94,15 +96,15 @@ class HipChat extends Adapter
           for user in users
             self.userForId self.userIdFromJid(user.jid), user
         else
-          console.log "Can't list users: #{err}"
+          logger.error "Can't list users: #{err}"
 
     bot.onError (message) ->
       # If HipChat sends an error, we get the error message from XMPP.
       # Otherwise, we get an Error object from the Node connection.
       if message.message
-        console.log "Error talking to HipChat:", message.message
+        logger.error "Error talking to HipChat:", message.message
       else
-        console.log "Received error from HipChat:", message
+        logger.error "Received error from HipChat:", message
 
     bot.onMessage (channel, from, message) ->
       author = {}
@@ -145,7 +147,7 @@ class HipChat extends Adapter
 
     # Join rooms automatically when invited
     bot.onInvite (room_jid, from_jid, message) =>
-      console.log "Got invite to #{room_jid} from #{from_jid} - joining"
+      logger.info "Got invite to #{room_jid} from #{from_jid} - joining"
       bot.join room_jid
 
     bot.connect()
@@ -156,14 +158,14 @@ class HipChat extends Adapter
     try
       return jid.match(/^\d+_(\d+)@chat\./)[1]
     catch e
-      console.log "Bad user JID: #{jid}"
+      logger.error "Bad user JID: #{jid}"
       return null
 
   roomNameFromJid: (jid) ->
     try
       return jid.match(/^\d+_(.+)@conf\./)[1]
     catch e
-      console.log "Bad room JID: #{jid}"
+      logger.error "Bad room JID: #{jid}"
       return null
 
   # Convenience HTTP Methods for posting on behalf of the token"d user
@@ -174,7 +176,7 @@ class HipChat extends Adapter
     @request "POST", path, body, callback
 
   request: (method, path, body, callback) ->
-    console.log method, path, body
+    logger.debug method, path, body
     host = @options.host or "api.hipchat.com"
     headers = "Host": host
 
@@ -200,7 +202,7 @@ class HipChat extends Adapter
         data += chunk
       response.on "end", ->
         if response.statusCode >= 400
-          console.log "HipChat API error: #{response.statusCode}"
+          logger.error "HipChat API error: #{response.statusCode}"
 
         try
           callback null, JSON.parse(data)
@@ -215,8 +217,8 @@ class HipChat extends Adapter
       request.end()
 
     request.on "error", (err) ->
-      console.log err
-      console.log err.stack
+      logger.error err
+      clogger.error err.stack
       callback err
 
 exports.use = (robot) ->
