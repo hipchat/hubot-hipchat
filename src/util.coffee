@@ -10,5 +10,3 @@ exports.require = (name, quiet) ->
   if quiet
     console[k] = v for own k, v of orig
   mod
-
-exports.words = words = (wordstr) -> wordstr.split " "
