@@ -55,7 +55,6 @@ class HipChat extends Adapter
       rooms:      process.env.HUBOT_HIPCHAT_ROOMS or "All"
       host:       process.env.HUBOT_HIPCHAT_HOST or null
       autojoin:   process.env.HUBOT_HIPCHAT_JOIN_ROOMS_ON_INVITE isnt "false"
-    @logger.debug "!!!!!!!!! #{process.env.HUBOT_HIPCHAT_JOIN_ROOMS_ON_INVITE}"
     @logger.debug "HipChat adapter options: #{JSON.stringify @options}"
 
     # create Connector object
