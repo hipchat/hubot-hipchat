@@ -110,6 +110,10 @@ Optional. This is a comma separated list of room JIDs that you want your bot to 
 
 Optional. Use to force the host to open the XMPP connection to.
 
+### HUBOT\_HIPCHAT\_JOIN\_ROOMS\_ON\_INVITE
+
+Optional.  Setting to `false` will prevent the HipChat adapter grom auto-joining rooms when invited.
+
 ### HUBOT\_LOG\_LEVEL
 
 Optional. Set to `debug` to enable detailed debug logging.

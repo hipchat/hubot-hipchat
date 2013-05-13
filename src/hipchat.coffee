@@ -49,11 +49,13 @@ class HipChat extends Adapter
 
   run: ->
     @options =
-      jid:      process.env.HUBOT_HIPCHAT_JID
-      password: process.env.HUBOT_HIPCHAT_PASSWORD
-      token:    process.env.HUBOT_HIPCHAT_TOKEN or null
-      rooms:    process.env.HUBOT_HIPCHAT_ROOMS or "All"
-      host:     process.env.HUBOT_HIPCHAT_HOST or null
+      jid:        process.env.HUBOT_HIPCHAT_JID
+      password:   process.env.HUBOT_HIPCHAT_PASSWORD
+      token:      process.env.HUBOT_HIPCHAT_TOKEN or null
+      rooms:      process.env.HUBOT_HIPCHAT_ROOMS or "All"
+      host:       process.env.HUBOT_HIPCHAT_HOST or null
+      autojoin:   process.env.HUBOT_HIPCHAT_JOIN_ROOMS_ON_INVITE isnt "false"
+    @logger.debug "!!!!!!!!! #{process.env.HUBOT_HIPCHAT_JOIN_ROOMS_ON_INVITE}"
     @logger.debug "HipChat adapter options: #{JSON.stringify @options}"
 
     # create Connector object
@@ -143,8 +145,9 @@ class HipChat extends Adapter
 
     # Join rooms automatically when invited
     connector.onInvite (room_jid, from_jid, message) =>
-      @logger.info "Got invite to #{room_jid} from #{from_jid} - joining"
-      connector.join room_jid
+      action = if @options.autojoin then "joining" else "ignoring"
+      @logger.info "Got invite to #{room_jid} from #{from_jid} - #{action}"
+      connector.join room_jid if @options.autojoin
 
     connector.connect()
 
