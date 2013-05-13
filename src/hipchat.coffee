@@ -98,7 +98,7 @@ class HipChat extends Adapter
           @logger.error "Can't list users: #{err}"
 
     connector.onDisconnect =>
-      @logger.info "Disconnected from #{host} as @#{connector.mention_name}"
+      @logger.info "Disconnected from #{host}"
 
     connector.onError =>
       @logger.error [].slice.call(arguments).map(inspect).join(", ")
