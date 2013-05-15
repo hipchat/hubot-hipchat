@@ -10,42 +10,28 @@ class HipChat extends Adapter
     @logger = robot.logger
 
   send: (envelope, strings...) ->
-    user = null
-    room = null
-    target_jid = null
+    {user, room} = envelope
+    user = envelope if not user # pre-2.4.2 style
 
-    # as of hubot 2.4.2, the first param to send() is an object with 'user'
-    # and 'room' data inside. detect the old style here.
-    if envelope.reply_to
-      user = envelope
-    else
-      # expand envelope
-      {user, room} = envelope
-
-    if user
+    target_jid =
       # most common case - we're replying to a user in a room or 1-1
-      if user.reply_to
-        target_jid = user.reply_to
+      user?.reply_to or
       # allows user objects to be passed in
-      else if user.jid
-        target_jid = user.jid
-      # allows user to be a jid string
-      else if user.search /@/ isnt -1
-        target_jid = user
-    else if room
-      # this will happen if someone uses robot.messageRoom(jid, ...)
-      target_jid = room
+      user?.jid or
+      if user?.search?(/@/) >= 0
+        user # allows user to be a jid string
+      else
+        room # this will happen if someone uses robot.messageRoom(jid, ...)
 
     if not target_jid
-      return @logger.error "ERROR: Not sure who to send to. envelope=", envelope
+      return @logger.error "ERROR: Not sure who to send to: envelope=#{inspect envelope}"
 
     for str in strings
       @connector.message target_jid, str
 
   reply: (envelope, strings...) ->
     user = if envelope.user then envelope.user else envelope
-    for str in strings
-      @send envelope, "@#{user.mention_name} #{str}"
+    @send envelope, "@#{user.mention_name} #{str}" for str in strings
 
   run: ->
     @options =
@@ -103,44 +89,33 @@ class HipChat extends Adapter
     connector.onError =>
       @logger.error [].slice.call(arguments).map(inspect).join(", ")
 
-    connector.onMessage (channel, from, message) =>
-      author = {}
+    handleMessage = (opts) =>
+      {message, from, reply_to, room} = opts
+      author = @robot.brain.userForName(from) or {}
       author.name = from
-      author.reply_to = channel
-      author.room = @roomNameFromJid(channel)
-
-      # add extra details if this message is from a known user
-      author_data = @robot.brain.userForName(from)
-      if author_data
-        author.name = author_data.name
-        author.mention_name = author_data.mention_name
-        author.jid = author_data.jid
+      author.reply_to = reply_to
+      author.room = room
 
       # reformat leading @mention name to be like "name: message" which is
       # what hubot expects
-      regex = new RegExp("^@#{connector.mention_name}\\b", "i")
-      hubot_msg = message.replace(regex, "#{connector.mention_name}: ")
+      mention_name = connector.mention_name
+      regex = new RegExp "^@#{mention_name}\\b", "i"
+      hubot_msg = message.replace regex, "#{mention_name}: "
 
       @receive new TextMessage(author, hubot_msg)
+
+    connector.onMessage (channel, from, message) =>
+      handleMessage
+        message: message
+        from: from
+        reply_to: channel
+        room: @roomNameFromJid(channel)
 
     connector.onPrivateMessage (from, message) =>
-      author = {}
-      author.reply_to = from
-
-      # add extra details if this message is from a known user
-      author_data = @robot.brain.userForId(@userIdFromJid(from))
-      if author_data
-        author.name = author_data.name
-        author.mention_name = author_data.mention_name
-        author.jid = author_data.jid
-
-      # remove leading @mention name if present and format the message like
-      # "name: message" which is what hubot expects
-      regex = new RegExp("^@#{connector.mention_name}\\b", "i")
-      message = message.replace(regex, "")
-      hubot_msg = "#{connector.mention_name}: #{message}"
-
-      @receive new TextMessage(author, hubot_msg)
+      handleMessage
+        message: message
+        from: from
+        reply_to: from
 
     # Join rooms automatically when invited
     connector.onInvite (room_jid, from_jid, message) =>
