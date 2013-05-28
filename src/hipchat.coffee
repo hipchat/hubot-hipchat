@@ -1,4 +1,4 @@
-{Adapter, TextMessage} = require "../../hubot"
+{Adapter, TextMessage, EnterMessage, LeaveMessage} = require "../../hubot"
 HTTPS = require "https"
 {inspect} = require "util"
 Connector = require "./connector"
@@ -77,11 +77,10 @@ class HipChat extends Adapter
 
       # Fetch user info
       connector.getRoster (err, users, stanza) =>
-        if users
-          for user in users
-            @robot.brain.userForId @userIdFromJid(user.jid), user
-        else
-          @logger.error "Can't list users: #{err}"
+        if err
+          return @logger.error "Can't list users: #{err}"
+        for user in users
+          @robot.brain.userForId @userIdFromJid(user.jid), user
 
     connector.onDisconnect =>
       @logger.info "Disconnected from #{host}"
@@ -117,11 +116,22 @@ class HipChat extends Adapter
         from: from
         reply_to: from
 
-    # Join rooms automatically when invited
     connector.onInvite (room_jid, from_jid, message) =>
       action = if @options.autojoin then "joining" else "ignoring"
       @logger.info "Got invite to #{room_jid} from #{from_jid} - #{action}"
       connector.join room_jid if @options.autojoin
+
+    changePresence = (PresenceMessage, user_jid, room_jid) =>
+      user = @robot.brain.userForId(@userIdFromJid(user_jid)) or {}
+      if user
+        user.room = room_jid
+        @receive new PresenceMessage(user)
+
+    connector.onEnter (user_jid, room_jid) ->
+      changePresence EnterMessage, user_jid, room_jid
+
+    connector.onLeave (user_jid, room_jid) ->
+      changePresence LeaveMessage, user_jid, room_jid
 
     connector.connect()
 

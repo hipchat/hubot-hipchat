@@ -322,6 +322,10 @@ module.exports = class Connector extends EventEmitter
   # - `callback`: Function to be triggered: `function (fromJid, message)`
   onPrivateMessage: onMessageFor "privateMessage"
 
+  onEnter: (callback) -> @on "enter", callback
+
+  onLeave: (callback) -> @on "leave", callback
+
   # Emitted whenever the connector pings the server (roughly every 30 seconds).
   #
   # - `callback`: Function to be triggered: `function ()`
@@ -415,9 +419,6 @@ onStanza = (stanza) ->
       fromJid = new xmpp.JID stanza.attrs.from
       @emit "privateMessage", fromJid.bare().toString(), body
     else if not stanza.attrs.type
-      # @todo It'd be great if we could have some sort of xpath-based listener
-      # so we could just watch for '/message/x/invite' stanzas instead of
-      # doing all this manual getChild nonsense
       x = stanza.getChild "x", "http://jabber.org/protocol/muc#user"
       return if not x
       invite = x.getChild "invite"
@@ -438,6 +439,22 @@ onStanza = (stanza) ->
       error_elem = stanza.getChild "error"
       condition = error_elem.children[0].name if error_elem
       @emit event_id, condition, stanza
+  else if stanza.is "presence"
+    jid = new xmpp.JID stanza.attrs.from
+    room = jid.bare().toString()
+    type = stanza.attrs.type or "available"
+    x = stanza.getChild "x", "http://jabber.org/protocol/muc#user"
+    return if not x
+    entity = x.getChild "item"
+    return if not entity
+    from = entity.attrs?.jid
+    return if not from
+    from = from.split("/")[0]
+    return if not from
+    if type is "unavailable"
+      @emit "leave", from, room
+    else if type is "available" and entity.attrs.role is "participant"
+      @emit "enter", from, room
 
 # DOM helpers
 
