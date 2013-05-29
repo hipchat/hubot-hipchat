@@ -105,16 +105,15 @@ class HipChat extends Adapter
 
     connector.onMessage (channel, from, message) =>
       author = {}
-      author.name = from
-      author.reply_to = channel
-      author.room = @roomNameFromJid(channel)
 
       # add extra details if this message is from a known user
       author_data = @robot.brain.userForName(from)
       if author_data
-        author.name = author_data.name
-        author.mention_name = author_data.mention_name
-        author.jid = author_data.jid
+        author = author_data
+      else
+        author.name = from
+      author.reply_to = channel
+      author.room = @roomNameFromJid(channel)
 
       # reformat leading @mention name to be like "name: message" which is
       # what hubot expects
