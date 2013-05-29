@@ -22,17 +22,16 @@ class HipChat extends Adapter
       # expand envelope
       {user, room} = envelope
 
-    if user
-      # most common case - we're replying to a user in a room or 1-1
-      if user.reply_to
-        target_jid = user.reply_to
-      # allows user objects to be passed in
-      else if user.jid
-        target_jid = user.jid
-      # allows user to be a jid string
-      else if user.search /@/ isnt -1
-        target_jid = user
-    else if room
+    # most common case - we're replying to a user in a room or 1-1
+    if user.reply_to
+      target_jid = user.reply_to
+    # allows user objects to be passed in
+    else if user.jid
+      target_jid = user.jid
+    # allows user to be a jid string
+    else if user.search /@/ isnt -1
+      target_jid = user
+    else if room?
       # this will happen if someone uses robot.messageRoom(jid, ...)
       target_jid = room
 
@@ -40,7 +39,8 @@ class HipChat extends Adapter
       return @logger.error "ERROR: Not sure who to send to. envelope=", envelope
 
     for str in strings
-      @connector.message target_jid, str
+      for single_jid in target_jid.split ","
+        @connector.message single_jid, str
 
   reply: (envelope, strings...) ->
     user = if envelope.user then envelope.user else envelope
