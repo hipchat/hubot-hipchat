@@ -80,7 +80,8 @@ class HipChat extends Adapter
         if err
           return @logger.error "Can't list users: #{err}"
         for user in users
-          @robot.brain.userForId @userIdFromJid(user.jid), user
+          user.id = @userIdFromJid(user.jid)
+          @robot.brain.userForId user.id, user
 
     connector.onDisconnect =>
       @logger.info "Disconnected from #{host}"
