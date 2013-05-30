@@ -124,14 +124,14 @@ class HipChat extends Adapter
 
     connector.onPrivateMessage (from, message) =>
       author = {}
-      author.reply_to = from
-
+      
       # add extra details if this message is from a known user
       author_data = @robot.brain.userForId(@userIdFromJid(from))
       if author_data
-        author.name = author_data.name
-        author.mention_name = author_data.mention_name
-        author.jid = author_data.jid
+        author = author_data
+      else
+        author.name = from
+      author.reply_to = from
 
       # remove leading @mention name if present and format the message like
       # "name: message" which is what hubot expects
