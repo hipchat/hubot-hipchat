@@ -24,6 +24,7 @@
   "main": "./src/hipchat",
   "dependencies": {
     "node-xmpp": "~0.3.2",
-    "underscore": "~1.4.4"
+    "underscore": "~1.4.4",
+    "fantasy-promises": "0.0.1"
   }
 }

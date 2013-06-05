@@ -2,6 +2,7 @@
 HTTPS = require "https"
 {inspect} = require "util"
 Connector = require "./connector"
+promise = require "./promises"
 
 class HipChat extends Adapter
 
@@ -61,78 +62,90 @@ class HipChat extends Adapter
       # Tell Hubot we're connected so it can load scripts
       @emit "connected"
 
-      # Join requested rooms
-      if @options.rooms is "All" or @options.rooms is "@All"
-        connector.getRooms (err, rooms, stanza) =>
-          if rooms
-            for room in rooms
-              @logger.info "Joining #{room.jid}"
-              connector.join room.jid
-          else
-            @logger.error "Can't list rooms: #{err}"
-      else
-        for room_jid in @options.rooms.split ","
-          @logger.info "Joining #{room_jid}"
-          connector.join room_jid
-
       # Fetch user info
-      connector.getRoster (err, users, stanza) =>
-        if err
-          return @logger.error "Can't list users: #{err}"
+      init = promise (resolve, reject) =>
+        connector.getRoster (err, users, stanza) =>
+          return reject err if err
+          resolve users
+
+      init.done (users) =>
         for user in users
-          user.id = @userIdFromJid(user.jid)
+          user.id = @userIdFromJid user.jid
           @robot.brain.userForId user.id, user
 
-    connector.onDisconnect =>
-      @logger.info "Disconnected from #{host}"
+        # Join requested rooms
+        if @options.rooms is "All" or @options.rooms is "@All"
+          connector.getRooms (err, rooms, stanza) =>
+            if rooms
+              for room in rooms
+                @logger.info "Joining #{room.jid}"
+                connector.join room.jid
+            else
+              @logger.error "Can't list rooms: #{err}"
+        else
+          for room_jid in @options.rooms.split ","
+            @logger.info "Joining #{room_jid}"
+            connector.join room_jid
 
-    connector.onError =>
-      @logger.error [].slice.call(arguments).map(inspect).join(", ")
+      init.fail (err) =>
+        @logger.error "Can't list users: #{err}"
 
-    handleMessage = (opts) =>
-      {message, from, reply_to, room} = opts
-      author = @robot.brain.userForName(from) or {}
-      author.name = from
-      author.reply_to = reply_to
-      author.room = room
+      handleMessage = (opts) =>
+        # buffer message events until the roster fetch completes
+        # to ensure user data is properly loaded
+        init.done =>
+          {message, from, reply_to, room} = opts
+          author = @robot.brain.userForName(from) or {}
+          author.name = from
+          author.reply_to = reply_to
+          author.room = room
 
-      # reformat leading @mention name to be like "name: message" which is
-      # what hubot expects
-      mention_name = connector.mention_name
-      regex = new RegExp "^@#{mention_name}\\b", "i"
-      hubot_msg = message.replace regex, "#{mention_name}: "
+          # reformat leading @mention name to be like "name: message" which is
+          # what hubot expects
+          mention_name = connector.mention_name
+          regex = new RegExp "^@#{mention_name}\\b", "i"
+          hubot_msg = message.replace regex, "#{mention_name}: "
 
-      @receive new TextMessage(author, hubot_msg)
+          @receive new TextMessage(author, hubot_msg)
 
-    connector.onMessage (channel, from, message) =>
-      handleMessage
-        message: message
-        from: from
-        reply_to: channel
-        room: @roomNameFromJid(channel)
+      connector.onMessage (channel, from, message) =>
+        handleMessage
+          message: message
+          from: from
+          reply_to: channel
+          room: @roomNameFromJid(channel)
 
-    connector.onPrivateMessage (from, message) =>
-      handleMessage
-        message: message
-        from: from
-        reply_to: from
+      connector.onPrivateMessage (from, message) =>
+        handleMessage
+          message: message
+          from: from
+          reply_to: from
 
-    connector.onInvite (room_jid, from_jid, message) =>
-      action = if @options.autojoin then "joining" else "ignoring"
-      @logger.info "Got invite to #{room_jid} from #{from_jid} - #{action}"
-      connector.join room_jid if @options.autojoin
+      changePresence = (PresenceMessage, user_jid, room_jid) =>
+        # buffer presence events until the roster fetch completes
+        # to ensure user data is properly loaded
+        init.done =>
+          user = @robot.brain.userForId(@userIdFromJid(user_jid)) or {}
+          if user
+            user.room = room_jid
+            @receive new PresenceMessage(user)
 
-    changePresence = (PresenceMessage, user_jid, room_jid) =>
-      user = @robot.brain.userForId(@userIdFromJid(user_jid)) or {}
-      if user
-        user.room = room_jid
-        @receive new PresenceMessage(user)
+      connector.onEnter (user_jid, room_jid) =>
+        changePresence EnterMessage, user_jid, room_jid
 
-    connector.onEnter (user_jid, room_jid) ->
-      changePresence EnterMessage, user_jid, room_jid
+      connector.onLeave (user_jid, room_jid) ->
+        changePresence LeaveMessage, user_jid, room_jid
 
-    connector.onLeave (user_jid, room_jid) ->
-      changePresence LeaveMessage, user_jid, room_jid
+      connector.onDisconnect =>
+        @logger.info "Disconnected from #{host}"
+
+      connector.onError =>
+        @logger.error [].slice.call(arguments).map(inspect).join(", ")
+
+      connector.onInvite (room_jid, from_jid, message) =>
+        action = if @options.autojoin then "joining" else "ignoring"
+        @logger.info "Got invite to #{room_jid} from #{from_jid} - #{action}"
+        connector.join room_jid if @options.autojoin
 
     connector.connect()
 

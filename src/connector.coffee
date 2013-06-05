@@ -400,6 +400,7 @@ onOnline = ->
 # it is a private message.
 onStanza = (stanza) ->
   @emit "data", stanza
+
   if stanza.is "message"
     if stanza.attrs.type is "groupchat"
       body = stanza.getChildText "body"
@@ -412,12 +413,14 @@ onStanza = (stanza) ->
       # Ignore our own messages
       return if fromNick is @name
       @emit "message", fromChannel, fromNick, body
+
     else if stanza.attrs.type is "chat"
       # Message without body is probably a typing notification
       body = stanza.getChildText "body"
       return if not body
       fromJid = new xmpp.JID stanza.attrs.from
       @emit "privateMessage", fromJid.bare().toString(), body
+
     else if not stanza.attrs.type
       x = stanza.getChild "x", "http://jabber.org/protocol/muc#user"
       return if not x
@@ -427,6 +430,7 @@ onStanza = (stanza) ->
       inviteRoom = new xmpp.JID stanza.attrs.from
       inviteSender = new xmpp.JID invite.attrs.from
       @emit "invite", inviteRoom.bare(), inviteSender.bare(), reason
+
   else if stanza.is "iq"
     # Handle a response to an IQ request
     event_id = "iq:#{stanza.attrs.id}"
@@ -439,9 +443,13 @@ onStanza = (stanza) ->
       error_elem = stanza.getChild "error"
       condition = error_elem.children[0].name if error_elem
       @emit event_id, condition, stanza
+
   else if stanza.is "presence"
     jid = new xmpp.JID stanza.attrs.from
     room = jid.bare().toString()
+    return if not room
+    # name = stanza.attrs.from.split("/")[1]
+    # return if not name
     type = stanza.attrs.type or "available"
     x = stanza.getChild "x", "http://jabber.org/protocol/muc#user"
     return if not x
@@ -449,12 +457,12 @@ onStanza = (stanza) ->
     return if not entity
     from = entity.attrs?.jid
     return if not from
-    from = from.split("/")[0]
-    return if not from
     if type is "unavailable"
       @emit "leave", from, room
+      # @emit "leave", from, name, room
     else if type is "available" and entity.attrs.role is "participant"
       @emit "enter", from, room
+      # @emit "enter", from, name, room
 
 # DOM helpers
 
