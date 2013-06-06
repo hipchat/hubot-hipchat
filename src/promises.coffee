@@ -1,8 +1,6 @@
-Promise = require "fantasy-promises"
+{Promise} = require "rsvp"
 
-Promise::done = (done) -> @fork done, null
-Promise::fail = (fail) -> @fork null, fail
+Promise::done = (done) -> @then done
+Promise::fail = (fail) -> @then null, fail
 
-module.exports = (fork) ->
-  new Promise (resolve, reject) ->
-    fork (resolve or ->), (reject or ->)
+module.exports = -> new Promise()

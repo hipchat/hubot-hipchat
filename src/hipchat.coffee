@@ -53,6 +53,8 @@ class HipChat extends Adapter
     host = if @options.host then @options.host else "hipchat.com"
     @logger.info "Connecting HipChat adapter..."
 
+    init = promise()
+
     connector.onConnect =>
       @logger.info "Connected to #{host} as @#{connector.mention_name}"
 
@@ -63,32 +65,32 @@ class HipChat extends Adapter
       @emit "connected"
 
       # Fetch user info
-      init = promise (resolve, reject) =>
-        connector.getRoster (err, users, stanza) =>
-          return reject err if err
-          resolve users
+      connector.getRoster (err, users, stanza) =>
+        return init.reject err if err
+        init.resolve users
 
-      init.done (users) =>
-        for user in users
-          user.id = @userIdFromJid user.jid
-          @robot.brain.userForId user.id, user
-
-        # Join requested rooms
-        if @options.rooms is "All" or @options.rooms is "@All"
-          connector.getRooms (err, rooms, stanza) =>
-            if rooms
-              for room in rooms
-                @logger.info "Joining #{room.jid}"
-                connector.join room.jid
-            else
-              @logger.error "Can't list rooms: #{err}"
-        else
-          for room_jid in @options.rooms.split ","
-            @logger.info "Joining #{room_jid}"
-            connector.join room_jid
-
-      init.fail (err) =>
-        @logger.error "Can't list users: #{err}"
+      init
+        .done (users) =>
+          # Save users to brain
+          for user in users
+            user.id = @userIdFromJid user.jid
+            @robot.brain.userForId user.id, user
+          # Join requested rooms
+          if @options.rooms is "All" or @options.rooms is "@All"
+            connector.getRooms (err, rooms, stanza) =>
+              if rooms
+                for room in rooms
+                  @logger.info "Joining #{room.jid}"
+                  connector.join room.jid
+              else
+                @logger.error "Can't list rooms: #{errmsg err}"
+          # Join all rooms
+          else
+            for room_jid in @options.rooms.split ","
+              @logger.info "Joining #{room_jid}"
+              connector.join room_jid
+        .fail (err) =>
+          @logger.error "Can't list users: #{errmsg err}" if err
 
       handleMessage = (opts) =>
         # buffer message events until the roster fetch completes
@@ -99,13 +101,11 @@ class HipChat extends Adapter
           author.name = from
           author.reply_to = reply_to
           author.room = room
-
           # reformat leading @mention name to be like "name: message" which is
           # what hubot expects
           mention_name = connector.mention_name
           regex = new RegExp "^@#{mention_name}\\b", "i"
           hubot_msg = message.replace regex, "#{mention_name}: "
-
           @receive new TextMessage(author, hubot_msg)
 
       connector.onMessage (channel, from, message) =>
@@ -213,6 +213,9 @@ class HipChat extends Adapter
       @logger.error err
       @logger.error err.stack if err.stack
       callback err
+
+errmsg = (err) ->
+  err + (if err.stack then '\n' + err.stack else '')
 
 exports.use = (robot) ->
   new HipChat robot
