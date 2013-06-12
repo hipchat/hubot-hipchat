@@ -101,14 +101,14 @@ class HipChat extends Adapter
           author.name = from
           author.reply_to = reply_to
           author.room = room
-          # reformat leading @mention name to be like "name: message" which is
-          # what hubot expects
-          mention_name = connector.mention_name
-          regex = new RegExp "^@#{mention_name}\\b", "i"
-          hubot_msg = message.replace regex, "#{mention_name}: "
-          @receive new TextMessage(author, hubot_msg)
+          @receive new TextMessage(author, message)
 
       connector.onMessage (channel, from, message) =>
+        # reformat leading @mention name to be like "name: message" which is
+        # what hubot expects
+        mention_name = connector.mention_name
+        regex = new RegExp "^@#{mention_name}\\b", "i"
+        message = message.replace regex, "#{mention_name}: "
         handleMessage
           message: message
           from: from
@@ -116,6 +116,11 @@ class HipChat extends Adapter
           room: @roomNameFromJid(channel)
 
       connector.onPrivateMessage (from, message) =>
+        # remove leading @mention name if present and format the message like
+        # "name: message" which is what hubot expects
+        mention_name = connector.mention_name
+        regex = new RegExp "^@#{mention_name}\\b", "i"
+        message = "#{mention_name}: #{message.replace regex, ""}"
         handleMessage
           message: message
           from: from
