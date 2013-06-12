@@ -96,9 +96,8 @@ class HipChat extends Adapter
         # buffer message events until the roster fetch completes
         # to ensure user data is properly loaded
         init.done =>
-          {message, from, reply_to, room} = opts
-          author = @robot.brain.userForName(from) or {}
-          author.name = from
+          {getAuthor, message, reply_to, room} = opts
+          author = getAuthor()
           author.reply_to = reply_to
           author.room = room
           @receive new TextMessage(author, message)
@@ -110,8 +109,8 @@ class HipChat extends Adapter
         regex = new RegExp "^@#{mention_name}\\b", "i"
         message = message.replace regex, "#{mention_name}: "
         handleMessage
+          getAuthor: => @robot.brain.userForName(from)
           message: message
-          from: from
           reply_to: channel
           room: @roomNameFromJid(channel)
 
@@ -122,8 +121,8 @@ class HipChat extends Adapter
         regex = new RegExp "^@#{mention_name}\\b", "i"
         message = "#{mention_name}: #{message.replace regex, ""}"
         handleMessage
+          getAuthor: => @robot.brain.userForId(@userIdFromJid from)
           message: message
-          from: from
           reply_to: from
 
       changePresence = (PresenceMessage, user_jid, room_jid) =>
