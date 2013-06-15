@@ -18,7 +18,7 @@ This is a HipChat-specific version of the more general [instructions in the Hubo
 
 1. Install `hubot` from npm, if you don't already have it:
 
-        % npm install --global hubot
+        % npm install --global hubot coffee-script
 
 1. Create a new `hubot` if necessary:
 
