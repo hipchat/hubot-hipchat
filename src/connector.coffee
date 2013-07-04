@@ -157,13 +157,7 @@ module.exports = class Connector extends EventEmitter
     iq = new xmpp.Element("iq", type: "get")
       .c("query", xmlns: "jabber:iq:roster")
     @sendIq iq, (err, stanza) ->
-      items = if err then [] else
-        # Parse response into objects
-        stanza.getChild("query").getChildren("item").map (el) ->
-          jid: el.attrs.jid
-          name: el.attrs.name
-          # Name used to @mention this user
-          mention_name: el.attrs.mention_name
+      items = if err then [] else usersFromStanza(stanza)
       callback err, (items or []), stanza
 
   # Updates the connector's availability and status.
@@ -326,6 +320,8 @@ module.exports = class Connector extends EventEmitter
 
   onLeave: (callback) -> @on "leave", callback
 
+  onRosterChange: (callback) -> @on "rosterChange", callback
+
   # Emitted whenever the connector pings the server (roughly every 30 seconds).
   #
   # - `callback`: Function to be triggered: `function ()`
@@ -436,6 +432,11 @@ onStanza = (stanza) ->
     event_id = "iq:#{stanza.attrs.id}"
     if stanza.attrs.type is "result"
       @emit event_id, null, stanza
+    else if stanza.attrs.type is "set"
+      # Check for roster push
+      if stanza.getChild("query").attrs.xmlns is "jabber:iq:roster"
+        users = usersFromStanza(stanza)
+        @emit "rosterChange", users, stanza
     else
       # IQ error response
       # ex: http://xmpp.org/rfcs/rfc6121.html#roster-syntax-actions-result
@@ -463,6 +464,14 @@ onStanza = (stanza) ->
     else if type is "available" and entity.attrs.role is "participant"
       @emit "enter", from, room
       # @emit "enter", from, name, room
+
+usersFromStanza = (stanza) ->
+  # Parse response into objects
+  stanza.getChild("query").getChildren("item").map (el) ->
+    jid: el.attrs.jid
+    name: el.attrs.name
+    # Name used to @mention this user
+    mention_name: el.attrs.mention_name
 
 # DOM helpers
 
