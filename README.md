@@ -112,7 +112,7 @@ Optional. Use to force the host to open the XMPP connection to.
 
 ### HUBOT\_HIPCHAT\_JOIN\_ROOMS\_ON\_INVITE
 
-Optional.  Setting to `false` will prevent the HipChat adapter grom auto-joining rooms when invited.
+Optional.  Setting to `false` will prevent the HipChat adapter from auto-joining rooms when invited.
 
 ### HUBOT\_LOG\_LEVEL
 
