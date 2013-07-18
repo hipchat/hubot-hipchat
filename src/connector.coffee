@@ -235,6 +235,21 @@ module.exports = class Connector extends EventEmitter
     packet.c("body").t(message)
     @jabber.send packet
 
+  # Send a topic change message to a room
+  #
+  # - `targetJid`: Target
+  #    - Message to a room: `????_????@conf.hipchat.com`
+  # - `message`: Text string that the topic should be set to
+  topic: (targetJid, message) ->
+    parsedJid = new xmpp.JID targetJid
+
+    packet = new xmpp.Element "message",
+      to: "#{targetJid}/#{@name}"
+      type: "groupchat"
+
+    packet.c("subject").t(message)
+    @jabber.send packet
+
   # Sends an IQ stanza and stores a callback to be called when its response
   # is received.
   #
