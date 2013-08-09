@@ -125,17 +125,19 @@ class HipChat extends Adapter
           message: message
           reply_to: from
 
-      changePresence = (PresenceMessage, user_jid, room_jid) =>
+      changePresence = (PresenceMessage, user_jid, room_jid, currentName) =>
         # buffer presence events until the roster fetch completes
         # to ensure user data is properly loaded
         init.done =>
           user = @robot.brain.userForId(@userIdFromJid(user_jid)) or {}
           if user
             user.room = room_jid
+            # If an updated name was sent as part of a presence, update it now
+            user.name = currentName if currentName.length
             @receive new PresenceMessage(user)
 
-      connector.onEnter (user_jid, room_jid) =>
-        changePresence EnterMessage, user_jid, room_jid
+      connector.onEnter (user_jid, room_jid, currentName) =>
+        changePresence EnterMessage, user_jid, room_jid, currentName
 
       connector.onLeave (user_jid, room_jid) ->
         changePresence LeaveMessage, user_jid, room_jid
