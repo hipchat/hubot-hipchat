@@ -30,6 +30,25 @@ class HipChat extends Adapter
     for str in strings
       @connector.message target_jid, str
 
+  topic: (envelope, message) ->
+    {user, room} = envelope
+    user = envelope if not user # pre-2.4.2 style
+
+    target_jid =
+      # most common case - we're replying to a user in a room or 1-1
+      user?.reply_to or
+      # allows user objects to be passed in
+      user?.jid or
+      if user?.search?(/@/) >= 0
+        user # allows user to be a jid string
+      else
+        room # this will happen if someone uses robot.messageRoom(jid, ...)
+
+    if not target_jid
+      return @logger.error "ERROR: Not sure who to send to: envelope=#{inspect envelope}"
+
+    @connector.topic target_jid, message
+
   reply: (envelope, strings...) ->
     user = if envelope.user then envelope.user else envelope
     @send envelope, "@#{user.mention_name} #{str}" for str in strings
