@@ -10,6 +10,9 @@ class HipChat extends Adapter
     super robot
     @logger = robot.logger
 
+  emote: (envelope, strings...) ->
+    @send envelope, strings.map((str) -> "/me #{str}")...
+
   send: (envelope, strings...) ->
     {user, room} = envelope
     user = envelope if not user # pre-2.4.2 style
