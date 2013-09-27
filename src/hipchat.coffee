@@ -1,4 +1,4 @@
-{Adapter, TextMessage, EnterMessage, LeaveMessage} = require "../../hubot"
+{Adapter, TextMessage, EnterMessage, LeaveMessage, User} = require "../../hubot"
 HTTPS = require "https"
 {inspect} = require "util"
 Connector = require "./connector"
@@ -109,7 +109,7 @@ class HipChat extends Adapter
         regex = new RegExp "^@#{mention_name}\\b", "i"
         message = message.replace regex, "#{mention_name}: "
         handleMessage
-          getAuthor: => @robot.brain.userForName(from)
+          getAuthor: => @robot.brain.userForName(from) or new User(from)
           message: message
           reply_to: channel
           room: @roomNameFromJid(channel)
