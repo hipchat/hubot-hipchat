@@ -221,7 +221,7 @@ module.exports = class Connector extends EventEmitter
   message: (targetJid, message) ->
     parsedJid = new xmpp.JID targetJid
 
-    if parsedJid.domain is @mucHost
+    if parsedJid.domain.match(/^conf\./)
       packet = new xmpp.Element "message",
         to: "#{targetJid}/#{@name}"
         type: "groupchat"
