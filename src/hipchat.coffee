@@ -63,6 +63,7 @@ class HipChat extends Adapter
       token:      process.env.HUBOT_HIPCHAT_TOKEN or null
       rooms:      process.env.HUBOT_HIPCHAT_ROOMS or "All"
       host:       process.env.HUBOT_HIPCHAT_HOST or null
+      mucHost:    process.env.HUBOT_HIPCHAT_MUCHOST or null
       autojoin:   process.env.HUBOT_HIPCHAT_JOIN_ROOMS_ON_INVITE isnt "false"
     @logger.debug "HipChat adapter options: #{JSON.stringify @options}"
 
@@ -71,6 +72,7 @@ class HipChat extends Adapter
       jid: @options.jid
       password: @options.password
       host: @options.host
+      mucHost: @options.mucHost
       logger: @logger
     host = if @options.host then @options.host else "hipchat.com"
     @logger.info "Connecting HipChat adapter..."
