@@ -16,9 +16,9 @@ This is a HipChat-specific version of the more general [instructions in the Hubo
         % apt-get install libexpat1-dev
         % apt-get install libicu-dev
 
-1. Install `hubot` from npm, if you don't already have it:
+1. Install `hubot` from npm, if you don't already have it. Note the explicit version reference. The version # of hubot-hipchat is kept in line with hubot. If your hubot's version is greater than hubot-hipchat's, that means it hasn't been tested and may not work!
 
-        % npm install --global coffee-script hubot@v2.5.1
+        % npm install --global coffee-script hubot@v2.6.4
 
 1. Create a new `hubot` if necessary:
 
