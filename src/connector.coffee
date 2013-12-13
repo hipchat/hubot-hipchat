@@ -387,7 +387,7 @@ onOnline = ->
   @setAvailability "chat"
 
   ping = =>
-    @jabber.send " "
+    @jabber.send new xmpp.Element('r')
     @emit "ping"
 
   @keepalive = setInterval ping, 30000
