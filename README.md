@@ -36,7 +36,7 @@ This is a HipChat-specific version of the more general [instructions in the Hubo
 
         % npm install --save hubot-hipchat
 
-1. Edit `Procfile` and change it to use the `hipchat` adapter:
+1. Edit `Procfile` and change it to use the `hipchat` adapter. You can also remove the `-n Hubot` arg as the bot will automatically fetch its @mention name from HipChat.
 
         web: bin/hubot --adapter hipchat
 
