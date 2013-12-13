@@ -86,6 +86,15 @@ class HipChat extends Adapter
       # Tell Hubot we're connected so it can load scripts
       @emit "connected"
 
+      saveUsers = (users) =>
+        # Save users to brain
+        for user in users
+          user.id = @userIdFromJid user.jid
+          # userForId will not overwrite an existing user
+          if user.id of @robot.brain.data.users
+            delete @robot.brain.data.users[user.id]
+          @robot.brain.userForId user.id, user
+
       # Fetch user info
       connector.getRoster (err, users, stanza) =>
         return init.reject err if err
@@ -93,10 +102,7 @@ class HipChat extends Adapter
 
       init
         .done (users) =>
-          # Save users to brain
-          for user in users
-            user.id = @userIdFromJid user.jid
-            @robot.brain.userForId user.id, user
+          saveUsers(users)
           # Join requested rooms
           if @options.rooms is "All" or @options.rooms is "@All"
             connector.getRooms (err, rooms, stanza) =>
@@ -113,6 +119,9 @@ class HipChat extends Adapter
               connector.join room_jid
         .fail (err) =>
           @logger.error "Can't list users: #{errmsg err}" if err
+
+      connector.onRosterChange (users) =>
+        saveUsers(users)
 
       handleMessage = (opts) =>
         # buffer message events until the roster fetch completes
