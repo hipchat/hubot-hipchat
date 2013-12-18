@@ -149,7 +149,7 @@ class HipChat extends Adapter
         # remove leading @mention name if present and format the message like
         # "name: message" which is what hubot expects
         mention_name = connector.mention_name
-        regex = new RegExp "^@#{mention_name}\\b", "i"
+        regex = new RegExp "^@?#{mention_name}\\b", "i"
         message = "#{mention_name}: #{message.replace regex, ""}"
         handleMessage
           getAuthor: => @robot.brain.userForId(@userIdFromJid from)
