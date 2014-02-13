@@ -58,12 +58,13 @@ class HipChat extends Adapter
 
   run: ->
     @options =
-      jid:        process.env.HUBOT_HIPCHAT_JID
-      password:   process.env.HUBOT_HIPCHAT_PASSWORD
-      token:      process.env.HUBOT_HIPCHAT_TOKEN or null
-      rooms:      process.env.HUBOT_HIPCHAT_ROOMS or "All"
-      host:       process.env.HUBOT_HIPCHAT_HOST or null
-      autojoin:   process.env.HUBOT_HIPCHAT_JOIN_ROOMS_ON_INVITE isnt "false"
+      jid:            process.env.HUBOT_HIPCHAT_JID
+      password:       process.env.HUBOT_HIPCHAT_PASSWORD
+      token:          process.env.HUBOT_HIPCHAT_TOKEN or null
+      rooms:          process.env.HUBOT_HIPCHAT_ROOMS or "All"
+      exclude_rooms:  process.env.HUBOT_HIPCHAT_EXCLUDE_ROOMS or null
+      host:           process.env.HUBOT_HIPCHAT_HOST or null
+      autojoin:       process.env.HUBOT_HIPCHAT_JOIN_ROOMS_ON_INVITE isnt "false"
     @logger.debug "HipChat adapter options: #{JSON.stringify @options}"
 
     # create Connector object
