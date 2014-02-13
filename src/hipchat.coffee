@@ -192,7 +192,7 @@ class HipChat extends Adapter
       connector.onInvite (room_jid, from_jid, message) =>
         action = if @options.autojoin then "joining" else "ignoring"
         @logger.info "Got invite to #{room_jid} from #{from_jid} - #{action}"
-        connector.join room_jid if @options.autojoin
+        joinRoom(room_jid) if @options.autojoin
 
     connector.connect()
 
