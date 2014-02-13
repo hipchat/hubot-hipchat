@@ -94,6 +94,10 @@ class HipChat extends Adapter
           if user.id of @robot.brain.data.users
             delete @robot.brain.data.users[user.id]
           @robot.brain.userForId user.id, user
+          
+      joinRoom = (jid) =>
+        @logger.info "Joining #{room.jid}"
+        connector.join room.jid
 
       # Fetch user info
       connector.getRoster (err, users, stanza) =>
@@ -108,15 +112,13 @@ class HipChat extends Adapter
             connector.getRooms (err, rooms, stanza) =>
               if rooms
                 for room in rooms
-                  @logger.info "Joining #{room.jid}"
-                  connector.join room.jid
+                  joinRoom(room.jid)
               else
                 @logger.error "Can't list rooms: #{errmsg err}"
           # Join all rooms
           else
             for room_jid in @options.rooms.split ","
-              @logger.info "Joining #{room_jid}"
-              connector.join room_jid
+              joinRoom(room_jid)
         .fail (err) =>
           @logger.error "Can't list users: #{errmsg err}" if err
 
