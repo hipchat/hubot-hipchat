@@ -97,8 +97,15 @@ class HipChat extends Adapter
           @robot.brain.userForId user.id, user
           
       joinRoom = (jid) =>
-        @logger.info "Joining #{room.jid}"
-        connector.join room.jid
+        excluded_jid = []
+        if @options.exclude_rooms is not "None"
+          excluded_jid = @options.exclude_rooms.split ","
+          
+        if excluded_jid.indexOf jid is -1
+          @logger.info "Joining #{jid}"
+          connector.join jid
+        else
+          @logger.info "Not joinging #{jid}"
 
       # Fetch user info
       connector.getRoster (err, users, stanza) =>
