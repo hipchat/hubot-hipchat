@@ -105,7 +105,7 @@ class HipChat extends Adapter
           @logger.info "Joining #{jid}"
           connector.join jid
         else
-          @logger.info "Not joinging #{jid}"
+          @logger.info "Not joining #{jid}"
 
       # Fetch user info
       connector.getRoster (err, users, stanza) =>
