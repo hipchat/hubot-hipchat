@@ -53,7 +53,7 @@ This is a HipChat-specific version of the more general [instructions in the Hubo
         % heroku create
         % heroku rename our-company-hubot
 
-1. Note: If you're going to include the redis-brain.coffee plugin you'll need to add [Redis To Go](http://devcenter.heroku.com/articles/redistogo).
+1. Add [Redis To Go](http://devcenter.heroku.com/articles/redistogo) to your Heroku app:
 
         % heroku addons:add redistogo:nano
 
