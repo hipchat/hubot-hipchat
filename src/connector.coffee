@@ -71,7 +71,7 @@ module.exports = class Connector extends EventEmitter
 
     # Multi-User-Conference (rooms) service host. Use when directing stanzas
     # to the MUC service.
-    @mucHost = "conf.#{if @host then @host else 'hipchat.com'}"
+    @mucHost = options.mucHost || "conf.#{if @host then @host else 'hipchat.com'}"
 
     @onError @disconnect
 
