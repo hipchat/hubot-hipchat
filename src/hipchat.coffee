@@ -64,6 +64,8 @@ class HipChat extends Adapter
       rooms:      process.env.HUBOT_HIPCHAT_ROOMS or "All"
       host:       process.env.HUBOT_HIPCHAT_HOST or null
       autojoin:   process.env.HUBOT_HIPCHAT_JOIN_ROOMS_ON_INVITE isnt "false"
+      xmppDomain: process.env.HUBOT_HIPCHAT_XMPP_DOMAIN or null
+
     @logger.debug "HipChat adapter options: #{JSON.stringify @options}"
 
     # create Connector object
@@ -72,6 +74,7 @@ class HipChat extends Adapter
       password: @options.password
       host: @options.host
       logger: @logger
+      xmppDomain: @options.xmppDomain
     host = if @options.host then @options.host else "hipchat.com"
     @logger.info "Connecting HipChat adapter..."
 
