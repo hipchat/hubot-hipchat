@@ -118,6 +118,10 @@ Optional.  Setting to `false` will prevent the HipChat adapter from auto-joining
 
 Optional. Set to `debug` to enable detailed debug logging.
 
+### HUBOT\_HIPCHAT\_RECONNECT
+
+Optional. Seting to `false` will prevent the HipChat adapter from auto-reconnecting if it detects a server error or disconnection.
+
 ## Running locally
 
 To run locally on OSX or Linux you'll need to set the required environment variables and run the `bin/hubot` script. An example script to run the bot might look like:
