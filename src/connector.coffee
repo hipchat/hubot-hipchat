@@ -68,10 +68,11 @@ module.exports = class Connector extends EventEmitter
     @password = options.password
     @host = options.host
     @caps_ver = options.caps_ver or "hubot-hipchat:#{pkg.version}"
+    @xmppDomain = options.xmppDomain
 
     # Multi-User-Conference (rooms) service host. Use when directing stanzas
     # to the MUC service.
-    @mucHost = "conf.#{if @host then @host else 'hipchat.com'}"
+    @mucDomain = "conf.#{if @xmppDomain then @xmppDomain else 'hipchat.com'}"
 
     @onError @disconnect
 
@@ -128,7 +129,7 @@ module.exports = class Connector extends EventEmitter
   #   - `rooms`: Array of objects containing room data
   #   - `stanza`: Full response stanza, an `xmpp.Element`
   getRooms: (callback) ->
-    iq = new xmpp.Element("iq", to: this.mucHost, type: "get")
+    iq = new xmpp.Element("iq", to: this.mucDomain, type: "get")
       .c("query", xmlns: "http://jabber.org/protocol/disco#items");
     @sendIq iq, (err, stanza) ->
       rooms = if err then [] else
@@ -215,7 +216,7 @@ module.exports = class Connector extends EventEmitter
   message: (targetJid, message) ->
     parsedJid = new xmpp.JID targetJid
 
-    if parsedJid.domain is @mucHost
+    if parsedJid.domain is @mucDomain
       packet = new xmpp.Element "message",
         to: "#{targetJid}/#{@name}"
         type: "groupchat"

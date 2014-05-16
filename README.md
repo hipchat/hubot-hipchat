@@ -73,6 +73,9 @@ This is a HipChat-specific version of the more general [instructions in the Hubo
 
         % heroku config:add HUBOT_HIPCHAT_PASSWORD="..."
 
+      If using HipChat Server Beta, you need to set xmppDomain to btf.hipchat.com.
+        % heroku config:add HUBOT_HIPCHAT_XMPP_DOMAIN="btf.hipchat.com"
+
 1. Deploy and start the bot:
 
         % git push heroku master
@@ -117,6 +120,10 @@ Optional.  Setting to `false` will prevent the HipChat adapter from auto-joining
 ### HUBOT\_LOG\_LEVEL
 
 Optional. Set to `debug` to enable detailed debug logging.
+
+### HUBOT\_HIPCHAT\_XMPP\_DOMAIN
+
+Optional. Set to btf.hipchat.com if using HipChat Server Beta.
 
 ## Running locally
 
