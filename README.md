@@ -109,21 +109,25 @@ This is the password for your bot's HipChat account.
 
 Optional. This is a comma separated list of room JIDs that you want your bot to join. You can leave this blank or set it to "All" to have your bot join every room. Room JIDs look like "123_development@conf.hipchat.com" and can be found in the [XMPP/Jabber account settings](https://www.hipchat.com/account/xmpp) - just add "@conf.hipchat.com" to the end of the room's "XMPP/Jabber Name".
 
+### HUBOT\_HIPCHAT\_ROOMS\_BLACKLIST
+
+Optional. This is a comma separated list of room JIDs that should not be joined.
+
+### HUBOT\_HIPCHAT\_JOIN\_ROOMS\_ON\_INVITE
+
+Optional. Setting to `false` will prevent the HipChat adapter from auto-joining rooms when invited.
+
 ### HUBOT\_HIPCHAT\_HOST
 
 Optional. Use to force the host to open the XMPP connection to.
 
-### HUBOT\_HIPCHAT\_JOIN\_ROOMS\_ON\_INVITE
+### HUBOT\_HIPCHAT\_XMPP\_DOMAIN
 
-Optional.  Setting to `false` will prevent the HipChat adapter from auto-joining rooms when invited.
+Optional. Set to btf.hipchat.com if using HipChat Server Beta.
 
 ### HUBOT\_LOG\_LEVEL
 
 Optional. Set to `debug` to enable detailed debug logging.
-
-### HUBOT\_HIPCHAT\_XMPP\_DOMAIN
-
-Optional. Set to btf.hipchat.com if using HipChat Server Beta.
 
 ## Running locally
 

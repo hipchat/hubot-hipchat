@@ -58,12 +58,13 @@ class HipChat extends Adapter
 
   run: ->
     @options =
-      jid:        process.env.HUBOT_HIPCHAT_JID
-      password:   process.env.HUBOT_HIPCHAT_PASSWORD
-      token:      process.env.HUBOT_HIPCHAT_TOKEN or null
-      rooms:      process.env.HUBOT_HIPCHAT_ROOMS or "All"
-      host:       process.env.HUBOT_HIPCHAT_HOST or null
-      autojoin:   process.env.HUBOT_HIPCHAT_JOIN_ROOMS_ON_INVITE isnt "false"
+      jid: process.env.HUBOT_HIPCHAT_JID
+      password: process.env.HUBOT_HIPCHAT_PASSWORD
+      token: process.env.HUBOT_HIPCHAT_TOKEN or null
+      rooms: process.env.HUBOT_HIPCHAT_ROOMS or "All"
+      rooms_blacklist: process.env.HUBOT_HIPCHAT_ROOMS_BLACKLIST or ""
+      host: process.env.HUBOT_HIPCHAT_HOST or null
+      autojoin: process.env.HUBOT_HIPCHAT_JOIN_ROOMS_ON_INVITE isnt "false"
       xmppDomain: process.env.HUBOT_HIPCHAT_XMPP_DOMAIN or null
 
     @logger.debug "HipChat adapter options: #{JSON.stringify @options}"
@@ -98,6 +99,16 @@ class HipChat extends Adapter
             delete @robot.brain.data.users[user.id]
           @robot.brain.userForId user.id, user
 
+      joinRoom = (jid) =>
+        blacklisted_room_jids = @options.rooms_blacklist.split ","
+
+        if jid in blacklisted_room_jids
+          @logger.info "Not joining #{jid} because it is blacklisted"
+          return
+
+        @logger.info "Joining #{jid}"
+        connector.join jid
+
       # Fetch user info
       connector.getRoster (err, users, stanza) =>
         return init.reject err if err
@@ -111,15 +122,13 @@ class HipChat extends Adapter
             connector.getRooms (err, rooms, stanza) =>
               if rooms
                 for room in rooms
-                  @logger.info "Joining #{room.jid}"
-                  connector.join room.jid
+                  joinRoom(room.jid)
               else
                 @logger.error "Can't list rooms: #{errmsg err}"
           # Join all rooms
           else
             for room_jid in @options.rooms.split ","
-              @logger.info "Joining #{room_jid}"
-              connector.join room_jid
+              joinRoom(room_jid)
         .fail (err) =>
           @logger.error "Can't list users: #{errmsg err}" if err
 
@@ -185,7 +194,7 @@ class HipChat extends Adapter
       connector.onInvite (room_jid, from_jid, message) =>
         action = if @options.autojoin then "joining" else "ignoring"
         @logger.info "Got invite to #{room_jid} from #{from_jid} - #{action}"
-        connector.join room_jid if @options.autojoin
+        joinRoom(room_jid) if @options.autojoin
 
     connector.connect()
 
