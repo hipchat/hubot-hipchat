@@ -86,6 +86,8 @@ module.exports = class Connector extends EventEmitter
     @jabber.on "error", bind(onStreamError, @)
     @jabber.on "online", bind(onOnline, @)
     @jabber.on "stanza", bind(onStanza, @)
+    @jabber.on "offline", bind(onOffline, @)
+    @jabber.on "close", bind(onClose, @)
 
     # debug network traffic
     do =>
@@ -99,6 +101,7 @@ module.exports = class Connector extends EventEmitter
   # Disconnect the connector from HipChat, remove the anti-idle and emit the
   # `disconnect` event.
   disconnect: =>
+    @logger.debug 'Disconnecting here'
     if @keepalive
       clearInterval @keepalive
       delete @keepalive
@@ -479,6 +482,14 @@ onStanza = (stanza) ->
       @emit "leave", from, room, name
     else if type is "available" and entity.attrs.role is "participant"
       @emit "enter", from, room, name
+
+onOffline = ->
+  @logger.info 'Connection went offline'
+  @disconnect()
+
+onClose = ->
+  @logger.info 'Connection was closed'
+  @disconnect()
 
 usersFromStanza = (stanza) ->
   # Parse response into objects
