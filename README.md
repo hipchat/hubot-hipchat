@@ -60,7 +60,7 @@ This is a HipChat-specific version of the more general [instructions in the Hubo
 
       You will need to set a configuration variable if you are hosting on the free Heroku plan.
 
-        % heroku config:add HEROKU_URL=http://soothing-mists-4567.herokuapp.com
+        % heroku config:add HEROKU_URL=http://our-company-hubot.herokuapp.com
 
       Where the URL is your Heroku app's URL (shown after running `heroku create`, or `heroku rename`).
 
