@@ -50,8 +50,7 @@ This is a HipChat-specific version of the more general [instructions in the Hubo
 
 1. Create a new Heroku application and (optionally) rename it:
 
-        % heroku create
-        % heroku rename our-company-hubot
+        % heroku create our-company-hubot
 
 1. Add [Redis To Go](http://devcenter.heroku.com/articles/redistogo) to your Heroku app:
 
