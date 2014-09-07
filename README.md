@@ -93,6 +93,12 @@ This is a HipChat-specific version of the more general [instructions in the Hubo
 
 Bonus: Add a notification hook to Heroku so a notification is sent to a room whenever the bot is updated: https://www.hipchat.com/help/page/heroku-integration
 
+## Scripting Gotchas
+`robot.messageRoom` syntax is as follows
+```
+robot.messageRoom("1234_room@conf.hipchat.com", "message");
+```
+
 ## Adapter configuration
 
 This adapter uses the following environment variables:
