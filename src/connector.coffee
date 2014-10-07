@@ -228,7 +228,14 @@ module.exports = class Connector extends EventEmitter
         type: "chat"
         from: @jid
       packet.c "inactive", xmlns: "http://jabber/protocol/chatstates"
-
+    # we should make sure that the message is properly escaped
+    # based on http://unix.stackexchange.com/questions/111899/how-to-strip-color-codes-out-of-stdout-and-pipe-to-file-and-stdout
+    message = message.replace(/\x1B\[([0-9]{1,2}(;[0-9]{1,2})?)?[mGK]/g, "")  # remove bash color codes
+    message = message.replace(/\</g, "&lt;")                                  # poorman's escape of html
+    message = message.replace(/\</g, "&gt;")                                  # poorman's escape of html
+    message = message.replace(/&/g, "&amp;")                                  # Replacing &
+    @logger.debug 'building message'
+    @logger.debug message
     packet.c("body").t(message)
     @jabber.send packet
 
