@@ -146,7 +146,6 @@ module.exports = class Connector extends EventEmitter
           topic: getText(x, "topic")
           privacy: getText(x, "privacy")
           owner: getText(x, "owner")
-          num_participants: getInt(x, "num_participants")
           guest_url: getText(x, "guest_url")
           is_archived: !!getChild(x, "is_archived")
       callback err, (rooms or []), stanza
