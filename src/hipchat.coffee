@@ -59,7 +59,7 @@ class HipChat extends Adapter
 
   waitAndReconnect: ->
     if !@reconnectTimer
-      delay = 10
+      delay = Math.round(Math.random() * (20 - 5) + 5)
       @logger.info "Waiting #{delay}s and then retrying..."
       @reconnectTimer = setTimeout () =>
          @logger.info "Attempting to reconnect..."
