@@ -59,13 +59,12 @@ class HipChat extends Adapter
 
   waitAndReconnect: ->
     if !@reconnectTimer
-      # Randomly wait between 5 and 20 seconds
       delay = Math.round(Math.random() * (20 - 5) + 5)
       @logger.info "Waiting #{delay}s and then retrying..."
       @reconnectTimer = setTimeout () =>
          @logger.info "Attempting to reconnect..."
          delete @reconnectTimer
-         @run()
+         @connector.connect()
       , delay * 1000
 
   run: ->
@@ -105,7 +104,8 @@ class HipChat extends Adapter
 
       if @options.reconnect
         @waitAndReconnect()
-
+    
+    firstTime = true
     connector.onConnect =>
       @logger.info "Connected to #{host} as @#{connector.mention_name}"
 
@@ -113,7 +113,9 @@ class HipChat extends Adapter
       @robot.name = connector.mention_name
 
       # Tell Hubot we're connected so it can load scripts
-      @emit "connected"
+      if firstTime
+        @emit "connected"
+        @logger.debug "Sending connected event"
 
       saveUsers = (users) =>
         # Save users to brain
@@ -170,28 +172,29 @@ class HipChat extends Adapter
           author.room = room
           @receive new TextMessage(author, message)
 
-      connector.onMessage (channel, from, message) =>
-        # reformat leading @mention name to be like "name: message" which is
-        # what hubot expects
-        mention_name = connector.mention_name
-        regex = new RegExp "^@#{mention_name}\\b", "i"
-        message = message.replace regex, "#{mention_name}: "
-        handleMessage
-          getAuthor: => @robot.brain.userForName(from) or new User(from)
-          message: message
-          reply_to: channel
-          room: @roomNameFromJid(channel)
+      if firstTime
+        connector.onMessage (channel, from, message) =>
+          # reformat leading @mention name to be like "name: message" which is
+          # what hubot expects
+          mention_name = connector.mention_name
+          regex = new RegExp "^@#{mention_name}\\b", "i"
+          message = message.replace regex, "#{mention_name}: "
+          handleMessage
+            getAuthor: => @robot.brain.userForName(from) or new User(from)
+            message: message
+            reply_to: channel
+            room: @roomNameFromJid(channel)
 
-      connector.onPrivateMessage (from, message) =>
-        # remove leading @mention name if present and format the message like
-        # "name: message" which is what hubot expects
-        mention_name = connector.mention_name
-        regex = new RegExp "^@?#{mention_name}\\b", "i"
-        message = "#{mention_name}: #{message.replace regex, ""}"
-        handleMessage
-          getAuthor: => @robot.brain.userForId(@userIdFromJid from)
-          message: message
-          reply_to: from
+        connector.onPrivateMessage (from, message) =>
+          # remove leading @mention name if present and format the message like
+          # "name: message" which is what hubot expects
+          mention_name = connector.mention_name
+          regex = new RegExp "^@?#{mention_name}\\b", "i"
+          message = "#{mention_name}: #{message.replace regex, ""}"
+          handleMessage
+            getAuthor: => @robot.brain.userForId(@userIdFromJid from)
+            message: message
+            reply_to: from
 
       changePresence = (PresenceMessage, user_jid, room_jid, currentName) =>
         # buffer presence events until the roster fetch completes
@@ -203,18 +206,19 @@ class HipChat extends Adapter
             # If an updated name was sent as part of a presence, update it now
             user.name = currentName if currentName.length
             @receive new PresenceMessage(user)
+      if firstTime
+        connector.onEnter (user_jid, room_jid, currentName) =>
+          changePresence EnterMessage, user_jid, room_jid, currentName
 
-      connector.onEnter (user_jid, room_jid, currentName) =>
-        changePresence EnterMessage, user_jid, room_jid, currentName
+        connector.onLeave (user_jid, room_jid) ->
+          changePresence LeaveMessage, user_jid, room_jid
 
-      connector.onLeave (user_jid, room_jid) ->
-        changePresence LeaveMessage, user_jid, room_jid
+        connector.onInvite (room_jid, from_jid, message) =>
+          action = if @options.autojoin then "joining" else "ignoring"
+          @logger.info "Got invite to #{room_jid} from #{from_jid} - #{action}"
+          joinRoom(room_jid) if @options.autojoin
 
-      connector.onInvite (room_jid, from_jid, message) =>
-        action = if @options.autojoin then "joining" else "ignoring"
-        @logger.info "Got invite to #{room_jid} from #{from_jid} - #{action}"
-        joinRoom(room_jid) if @options.autojoin
-
+      firstTime = false
     connector.connect()
 
     @connector = connector
