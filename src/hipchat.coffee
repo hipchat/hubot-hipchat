@@ -78,7 +78,7 @@ class HipChat extends Adapter
       autojoin: process.env.HUBOT_HIPCHAT_JOIN_ROOMS_ON_INVITE isnt "false"
       xmppDomain: process.env.HUBOT_HIPCHAT_XMPP_DOMAIN or null
       reconnect: process.env.HUBOT_HIPCHAT_RECONNECT isnt "false"
-
+    @roomsByChannel = {}
     @logger.debug "HipChat adapter options: #{JSON.stringify @options}"
 
     # create Connector object
@@ -144,18 +144,16 @@ class HipChat extends Adapter
       init
         .done (users) =>
           saveUsers(users)
-          # Join requested rooms
-          if @options.rooms is "All" or @options.rooms is "@All"
-            connector.getRooms (err, rooms, stanza) =>
-              if rooms
-                for room in rooms
-                  joinRoom(room.jid)
-              else
-                @logger.error "Can't list rooms: #{errmsg err}"
-          # Join all rooms
+          # Join rooms
+          if rooms
+            if @options.rooms isnt "All" and @options.rooms isnt "@All"
+              reqJids = @options.rooms.split ","
+            for room in rooms
+              @roomsByChannel[room.name.toLowerCase()] = room
+              if @options.rooms is "All" or @options.rooms is "@All" or reqJids.indexOf(room.jid) >= 0
+                joinRoom(room.jid)
           else
-            for room_jid in @options.rooms.split ","
-              joinRoom(room_jid)
+            @logger.error "Can't list rooms: #{errmsg err}"
         .fail (err) =>
           @logger.error "Can't list users: #{errmsg err}" if err
 
@@ -179,11 +177,12 @@ class HipChat extends Adapter
           mention_name = connector.mention_name
           regex = new RegExp "^@#{mention_name}\\b", "i"
           message = message.replace regex, "#{mention_name}: "
+          jid = @roomJidFromChannel(channel)
           handleMessage
             getAuthor: => @robot.brain.userForName(from) or new User(from)
             message: message
-            reply_to: channel
-            room: @roomNameFromJid(channel)
+            reply_to: jid
+            room: @roomNameFromJid(jid)
 
         connector.onPrivateMessage (from, message) =>
           # remove leading @mention name if present and format the message like
@@ -228,6 +227,13 @@ class HipChat extends Adapter
       jid.match(/^\d+_(\d+)@chat\./)[1]
     catch e
       @logger.error "Bad user JID: #{jid}"
+
+  roomJidFromChannel: (channel) ->
+    try
+      roomName = channel.match(/^\d+_(.+)@conf\./)[1]
+      @roomsByChannel[roomName].jid
+    catch e
+      @logger.error "Bad room Channel: #{channel}"
 
   roomNameFromJid: (jid) ->
     try
