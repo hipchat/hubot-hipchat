@@ -69,6 +69,7 @@ module.exports = class Connector extends EventEmitter
     @jid = jid.toString()
     @password = options.password
     @host = options.host
+    @bosh = options.bosh
     @caps_ver = options.caps_ver or "hubot-hipchat:#{pkg.version}"
     @xmppDomain = options.xmppDomain
 
@@ -84,6 +85,7 @@ module.exports = class Connector extends EventEmitter
       jid: @jid,
       password: @password,
       host: @host
+      bosh: @bosh
 
     @jabber.on "error", bind(onStreamError, @)
     @jabber.on "online", bind(onOnline, @)
