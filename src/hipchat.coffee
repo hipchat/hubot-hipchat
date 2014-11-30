@@ -104,7 +104,7 @@ class HipChat extends Adapter
 
       if @options.reconnect
         @waitAndReconnect()
-    
+
     firstTime = true
     connector.onConnect =>
       @logger.info "Connected to #{host} as @#{connector.mention_name}"
@@ -121,8 +121,12 @@ class HipChat extends Adapter
         # Save users to brain
         for user in users
           user.id = @userIdFromJid user.jid
-          # userForId will not overwrite an existing user
+          # userForId will not merge to an existing user
           if user.id of @robot.brain.data.users
+            oldUser = @robot.brain.data.users[user.id]
+            for key, value of oldUser
+              unless key of user
+                user[key] = value
             delete @robot.brain.data.users[user.id]
           @robot.brain.userForId user.id, user
 
