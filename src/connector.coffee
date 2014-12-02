@@ -28,7 +28,9 @@ util = require "./util"
 # node 0.10+, so require it through our helper that suppresses console messages;
 # it's complaint doesn't seem to effect the functionality of xmpp that we need
 # anyway...
-xmpp = util.require "node-xmpp", "quiet"
+xmpp = util.require "node-xmpp-core", "quiet"
+xmpp.Client = util.require("node-xmpp-client", "quiet").Client
+xmpp.Element = xmpp.Stanza.Element
 
 # Parse and cache the node package.json file when this module is loaded
 pkg = do ->
@@ -67,6 +69,7 @@ module.exports = class Connector extends EventEmitter
     @jid = jid.toString()
     @password = options.password
     @host = options.host
+    @bosh = options.bosh
     @caps_ver = options.caps_ver or "hubot-hipchat:#{pkg.version}"
     @xmppDomain = options.xmppDomain
 
@@ -82,6 +85,7 @@ module.exports = class Connector extends EventEmitter
       jid: @jid,
       password: @password,
       host: @host
+      bosh: @bosh
 
     @jabber.on "error", bind(onStreamError, @)
     @jabber.on "online", bind(onOnline, @)
