@@ -171,7 +171,7 @@ class HipChat extends Adapter
         # to ensure user data is properly loaded
         init.done =>
           {getAuthor, message, reply_to, room} = opts
-          author = Object.create(getAuthor()) or {}
+          author = getAuthor() or {}
           author.reply_to = reply_to
           author.room = room
           @receive new TextMessage(author, message)
