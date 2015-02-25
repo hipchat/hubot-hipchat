@@ -422,24 +422,26 @@ onStanza = (stanza) ->
 
   if stanza.is "message"
     if stanza.attrs.type is "groupchat"
-      # look for Subject first: http://xmpp.org/extensions/xep-0045.html#subject-mod
 
-      # Now look for groupchat message body
-      #body = stanza.getChildText "body"
-      #return if not body
-      # Ignore chat history
       return if stanza.getChild "delay"
       fromJid = new xmpp.JID stanza.attrs.from
       fromChannel = fromJid.bare().toString()
       fromNick = fromJid.resource
       # Ignore our own messages
       return if fromNick is @name
+      # Look for body msg
       body = stanza.getChildText "body"
+      # look for Subject: http://xmpp.org/extensions/xep-0045.html#subject-mod
       subject = stanza.getChildText "subject"
       if body
+        # message stanza
         @emit "message", fromChannel, fromNick, body
       else if subject
+        # subject stanza
         @emit "topic", fromChannel, fromNick, body
+      else
+        # Skip parsing other types and return
+        return
 
     else if stanza.attrs.type is "chat"
       # Message without body is probably a typing notification
