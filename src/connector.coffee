@@ -438,7 +438,7 @@ onStanza = (stanza) ->
         @emit "message", fromChannel, fromNick, body
       else if subject
         # subject stanza
-        @emit "topic", fromChannel, fromNick, body
+        @emit "topic", fromChannel, fromNick, subject
       else
         # Skip parsing other types and return
         return
