@@ -287,6 +287,9 @@ module.exports = class Connector extends EventEmitter
   # - `callback`: Function to be triggered: `function ()`
   onDisconnect: (callback) -> @on "disconnect", callback
 
+  # Emitted whenever the connector receives a topic change in a room
+  onTopic: (callback) -> @on "topic", callback
+
   # Emitted whenever the connector is invited to a room.
   #
   # `onInvite(callback)`
