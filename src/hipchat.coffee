@@ -1,4 +1,4 @@
-{Adapter, TextMessage, EnterMessage, LeaveMessage, TopicMessage, User} = require "../../hubot"
+{Adapter, TextMessage, EnterMessage, LeaveMessage, TopicMessage, User} = require "hubot"
 HTTPS = require "https"
 {inspect} = require "util"
 Connector = require "./connector"
