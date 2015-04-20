@@ -149,3 +149,5 @@ To run locally on OSX or Linux you'll need to set the required environment varia
     export HUBOT_HIPCHAT_PASSWORD="..."
 
     bin/hubot --adapter hipchat
+
+But be aware that credentials normally shouldn't be checked into your vcs.
