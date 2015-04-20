@@ -10,21 +10,18 @@
     "chat",
     "bot"
   ],
-  "licenses": [
-    {
-      "type": "MIT",
-      "url": "http://github.com/hipchat/hubot-hipchat/raw/master/LICENSE"
-    }
-  ],
   "repository": {
     "type": "git",
     "url": "http://github.com/hipchat/hubot-hipchat.git"
   },
   "license": "MIT",
   "main": "./src/hipchat",
+  "engines": {
+    "node" : "~0.12.2"
+  },
   "dependencies": {
-    "node-xmpp-client": "^1.0.0-alpha19",
-    "node-xmpp-core": "^1.0.0-alpha13",
+    "node-xmpp-client": "^1.0.0-alpha20",
+    "node-xmpp-core": "^1.0.0-alpha14",
     "rsvp": "~1.2.0",
     "underscore": "~1.4.4"
   }
