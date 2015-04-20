@@ -22,13 +22,10 @@
 
 {EventEmitter} = require "events"
 fs = require "fs"
-util = require "./util"
 {bind, isString, isRegExp} = require "underscore"
-# The xmpp module emits warnings about node-stringprep that are unfixable on
-# node 0.10+, so require it through our helper that suppresses console messages;
-# it's complaint doesn't seem to effect the functionality of xmpp that we need
-# anyway...
-xmpp = util.require "node-xmpp", "quiet"
+xmpp = require 'node-xmpp-client'
+xmpp.Element = xmpp.ltx.Element
+xmpp.JID = require('node-xmpp-core').JID
 
 # Parse and cache the node package.json file when this module is loaded
 pkg = do ->
