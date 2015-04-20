@@ -75,6 +75,7 @@ class HipChat extends Adapter
       rooms: process.env.HUBOT_HIPCHAT_ROOMS or "All"
       rooms_blacklist: process.env.HUBOT_HIPCHAT_ROOMS_BLACKLIST or ""
       host: process.env.HUBOT_HIPCHAT_HOST or null
+      bosh: { url: process.env.HUBOT_HIPCHAT_BOSH_URL or null }
       autojoin: process.env.HUBOT_HIPCHAT_JOIN_ROOMS_ON_INVITE isnt "false"
       xmppDomain: process.env.HUBOT_HIPCHAT_XMPP_DOMAIN or null
       reconnect: process.env.HUBOT_HIPCHAT_RECONNECT isnt "false"
