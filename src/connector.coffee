@@ -449,6 +449,8 @@ onStanza = (stanza) ->
       # Message without body is probably a typing notification
       body = stanza.getChildText "body"
       return if not body
+      # Ignore chat history
+      return if stanza.getChild "delay"
       fromJid = new xmpp.JID stanza.attrs.from
       @emit "privateMessage", fromJid.bare().toString(), body
 
