@@ -1,4 +1,4 @@
-{Adapter, TextMessage, EnterMessage, LeaveMessage, User} = require "../../hubot"
+{Adapter, TextMessage, EnterMessage, LeaveMessage, TopicMessage, User} = require "../../hubot"
 HTTPS = require "https"
 {inspect} = require "util"
 Connector = require "./connector"
@@ -92,6 +92,13 @@ class HipChat extends Adapter
     @logger.info "Connecting HipChat adapter..."
 
     init = promise()
+
+    connector.onTopic (channel, from, message) =>
+      @logger.info "Topic change: " + message
+      author = getAuthor: => @robot.brain.userForName(from) or new User(from)
+      author.room = @roomNameFromJid(channel)
+      @receive new TopicMessage(author, message, 'id')
+
 
     connector.onDisconnect =>
       @logger.info "Disconnected from #{host}"
