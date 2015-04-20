@@ -514,6 +514,8 @@ usersFromStanza = (stanza) ->
     name: el.attrs.name
     # Name used to @mention this user
     mention_name: el.attrs.mention_name
+    # Email address
+    email_address: el.attrs.email
 
 # DOM helpers
 
