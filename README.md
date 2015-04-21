@@ -2,43 +2,27 @@
 
 ## Quickstart: Hubot for HipChat on Heroku
 
-This is a HipChat-specific version of the more general [instructions in the Hubot wiki](https://github.com/github/hubot/wiki/Deploying-Hubot-onto-Heroku).
+This is a HipChat-specific version of the more general [instructions in the Hubot wiki](https://github.com/github/hubot/wiki/Deploying-Hubot-onto-Heroku). Some of this guide is derived from Hubot's [general set up instructions](https://hubot.github.com/docs). You may wish to see that guide for more information about the general use and configuration of Hubot, in addition to details for deploying it to environments other than Heroku.
 
 1. From your existing HipChat account add your bot as a [new user](http://help.hipchat.com/knowledgebase/articles/64413-how-do-i-add-invite-new-users-). Stay signed in to the account - we'll need to access its account settings later.
 
-1. Make sure native dependencies are installed:
+1. If you are using Linux, make sure libexpat is installed:
 
-        (e.g. OS X with brew)
-        % brew install icu4c
-        % brew link icu4c
-
-        (e.g. Linux with apt-get)
         % apt-get install libexpat1-dev
-        % apt-get install libicu-dev
 
-1. Install `hubot` from npm, if you don't already have it. Note the explicit version reference. The version # of hubot-hipchat is kept in line with hubot. If your hubot's version is greater than hubot-hipchat's, that means it hasn't been tested and may not work!
+1. You will need [node.js](https://nodejs.org). Joyent has an [excellent blog post on how to get those installed](https://www.joyent.com/blog/installing-node-and-npm), so we'll omit those details here.  You'll want node.js 0.12.x or later.
 
-        % npm install --global coffee-script hubot@v2.7.5
+1. Once node and npm are ready, we can install the hubot generator:
 
-1. Create a new `hubot` if necessary:
+        %  npm install -g yo generator-hubot
 
-        % hubot --create <path>
+1. This will give us the hubot yeoman generator. Now we can make a new directory, and generate a new instance of hubot in it, using this Hubot HipChat adapter. For example, if we wanted to make a bot called myhubot:
 
-1. Switch to the new `hubot` directory:
+        % mkdir myhubot
+        % cd myhubot
+        % yo hubot --adapter hipchat
 
-        % cd <above path>
-
-1. Install `hubot` dependencies:
-
-        % npm install
-
-1. Install the `hipchat` adapter:
-
-        % npm install --save hubot-hipchat
-
-1. Edit `Procfile` and change it to use the `hipchat` adapter. You can also remove the `-n Hubot` arg as the bot will automatically fetch its @mention name from HipChat.
-
-        web: bin/hubot --adapter hipchat
+1. At this point, you'll be asked a few questions about the bot you are creating. When you finish answering, yeoman will download and install the necessary dependencies.
 
 1. Turn your `hubot` directory into a git repository:
 
