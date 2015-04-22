@@ -2,6 +2,12 @@
 
 ## Quickstart: Hubot for HipChat on Heroku
 
+### The Easy Way
+
+[![Deploy](https://www.herokucdn.com/deploy/button.png)](https://heroku.com/deploy?template=https://github.com/hipchat/triatomic)
+
+### The "I do it myself!" Way
+
 This is a HipChat-specific version of the more general [instructions in the Hubot wiki](https://github.com/github/hubot/wiki/Deploying-Hubot-onto-Heroku). Some of this guide is derived from Hubot's [general set up instructions](https://hubot.github.com/docs). You may wish to see that guide for more information about the general use and configuration of Hubot, in addition to details for deploying it to environments other than Heroku.
 
 1. From your existing HipChat account add your bot as a [new user](http://help.hipchat.com/knowledgebase/articles/64413-how-do-i-add-invite-new-users-). Stay signed in to the account - we'll need to access its account settings later.
@@ -22,7 +28,7 @@ This is a HipChat-specific version of the more general [instructions in the Hubo
         % cd myhubot
         % yo hubot --adapter hipchat
 
-1. At this point, you'll be asked a few questions about the bot you are creating. When you finish answering, yeoman will download and install the necessary dependencies.
+1. At this point, you'll be asked a few questions about the bot you are creating. When you finish answering, yeoman will download and install the necessary dependencies. (If the generator hangs, a workaround is to re-run without the `--adapter hipchat` argument, accept the default `campfire` value when prompted, and then re-run yet again, again with the hipchat adapter argument, accepting the prompts to overwrite existing files. This appears to be an issue with the generator itself.)
 
 1. Turn your `hubot` directory into a git repository:
 
