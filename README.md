@@ -4,6 +4,8 @@
 
 ### The Easy Way
 
+Try deploying the "[Triatomic](https://github.com/hipchat/triatomic)" starter HipChat Hubot project to Heroku. Once you have it running, simply clone it and customize its scripts as you please.
+
 [![Deploy](https://www.herokucdn.com/deploy/button.png)](https://heroku.com/deploy?template=https://github.com/hipchat/triatomic)
 
 ### The "I do it myself!" Way
