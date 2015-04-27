@@ -139,9 +139,10 @@ class HipChat extends Adapter
           @robot.brain.userForId user.id, user
 
       joinRoom = (jid) =>
-        blacklisted_room_jids = @options.rooms_blacklist.split ","
-
-        if jid in blacklisted_room_jids
+        if jid and typeof jid is "object"
+          jid = "#{jid.local}@#{jid.domain}"
+        
+        if jid in @options.rooms_blacklist.split(",")
           @logger.info "Not joining #{jid} because it is blacklisted"
           return
 
