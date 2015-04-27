@@ -68,9 +68,15 @@ class HipChat extends Adapter
       , delay * 1000
 
   run: ->
+    botjid = process.env.HUBOT_HIPCHAT_JID
+    if not botjid
+      throw new Error("Environment variable HUBOT_HIPCHAT_JID is required to contain your bot's user JID.")
+    botpw = process.env.HUBOT_HIPCHAT_PASSWORD
+    if not botpw
+      throw new Error("Environment variable HUBOT_HIPCHAT_PASSWORD is required to contain your bot's user password.")
     @options =
-      jid: process.env.HUBOT_HIPCHAT_JID
-      password: process.env.HUBOT_HIPCHAT_PASSWORD
+      jid: botjid
+      password: botpw
       token: process.env.HUBOT_HIPCHAT_TOKEN or null
       rooms: process.env.HUBOT_HIPCHAT_ROOMS or "All"
       rooms_blacklist: process.env.HUBOT_HIPCHAT_ROOMS_BLACKLIST or ""
