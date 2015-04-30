@@ -115,6 +115,10 @@ Optional. This is a comma separated list of room JIDs that should not be joined.
 
 Optional. Setting to `false` will prevent the HipChat adapter from auto-joining rooms when invited.
 
+### HUBOT\_HIPCHAT\_JOIN\_PUBLIC\_ROOMS
+
+Optional. Setting to `false` will prevent the HipChat adapter from auto-joining rooms that are publicly available.
+
 ### HUBOT\_HIPCHAT\_HOST
 
 Optional. Use to force the host to open the XMPP connection to.
