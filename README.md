@@ -117,7 +117,7 @@ Optional. Setting to `false` will prevent the HipChat adapter from auto-joining 
 
 ### HUBOT\_HIPCHAT\_JOIN\_PUBLIC\_ROOMS
 
-Optional. Setting to `false` will prevent the HipChat adapter from auto-joining rooms that are publicly available.
+Optional. Setting to `false` will prevent the HipChat adapter from auto-joining rooms that are publicly available (i.e. guest-accessible).
 
 ### HUBOT\_HIPCHAT\_HOST
 
