@@ -74,6 +74,7 @@ class HipChat extends Adapter
       token: process.env.HUBOT_HIPCHAT_TOKEN or null
       rooms: process.env.HUBOT_HIPCHAT_ROOMS or "All"
       rooms_blacklist: process.env.HUBOT_HIPCHAT_ROOMS_BLACKLIST or ""
+      rooms_join_public: process.env.HUBOT_HIPCHAT_JOIN_PUBLIC_ROOMS isnt "false"
       host: process.env.HUBOT_HIPCHAT_HOST or null
       bosh: { url: process.env.HUBOT_HIPCHAT_BOSH_URL or null }
       autojoin: process.env.HUBOT_HIPCHAT_JOIN_ROOMS_ON_INVITE isnt "false"
@@ -141,7 +142,7 @@ class HipChat extends Adapter
       joinRoom = (jid) =>
         if jid and typeof jid is "object"
           jid = "#{jid.local}@#{jid.domain}"
-        
+
         if jid in @options.rooms_blacklist.split(",")
           @logger.info "Not joining #{jid} because it is blacklisted"
           return
@@ -162,7 +163,10 @@ class HipChat extends Adapter
             connector.getRooms (err, rooms, stanza) =>
               if rooms
                 for room in rooms
-                  joinRoom(room.jid)
+                  if !@options.rooms_join_public && room.guest_url != ''
+                    @logger.info "Not joining #{room.jid} because it is a public room"
+                  else
+                    joinRoom(room.jid)
               else
                 @logger.error "Can't list rooms: #{errmsg err}"
           # Join all rooms
