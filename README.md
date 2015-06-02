@@ -125,7 +125,7 @@ Optional. Use to force the host to open the XMPP connection to.
 
 ### HUBOT\_HIPCHAT\_XMPP\_DOMAIN
 
-Optional. Set to btf.hipchat.com if using HipChat Server Beta.
+Optional. Set to btf.hipchat.com if using HipChat Server.
 
 ### HUBOT\_LOG\_LEVEL
 
