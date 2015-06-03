@@ -229,6 +229,7 @@ module.exports = class Connector extends EventEmitter
     # based on http://unix.stackexchange.com/questions/111899/how-to-strip-color-codes-out-of-stdout-and-pipe-to-file-and-stdout
     message = message.replace(/\x1B\[([0-9]{1,2}(;[0-9]{1,2})?)?[mGK]/g, "")  # remove bash color codes
     message = message.replace(/&/g, "&amp;")                                  # Replacing &
+    message = message.replace(/:(\w+):/g, "($1)")                             # To paren emoticons
     @logger.debug 'building message'
     @logger.debug message
     packet.c("body").t(message)
