@@ -137,7 +137,7 @@ module.exports = class Connector extends EventEmitter
         stanza.getChild("query").getChildren("item").map (el) ->
           x = el.getChild "x", "http://hipchat.com/protocol/muc#room"
           # A room
-          jid: el.attrs.jid
+          jid: el.attrs.jid.trim()
           name: el.attrs.name
           id: getInt(x, "id")
           topic: getText(x, "topic")
