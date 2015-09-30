@@ -9,7 +9,6 @@ class HipChat extends Adapter
   constructor: (robot) ->
     super robot
     @logger = robot.logger
-    reconnectTimer = null
 
   emote: (envelope, strings...) ->
     @send envelope, strings.map((str) -> "/me #{str}")...
@@ -57,16 +56,6 @@ class HipChat extends Adapter
     user = if envelope.user then envelope.user else envelope
     @send envelope, "@#{user.mention_name} #{str}" for str in strings
 
-  waitAndReconnect: ->
-    if !@reconnectTimer
-      delay = Math.round(Math.random() * (20 - 5) + 5)
-      @logger.info "Waiting #{delay}s and then retrying..."
-      @reconnectTimer = setTimeout () =>
-         @logger.info "Attempting to reconnect..."
-         delete @reconnectTimer
-         @connector.connect()
-      , delay * 1000
-
   run: ->
     @options =
       jid: process.env.HUBOT_HIPCHAT_JID
@@ -90,6 +79,7 @@ class HipChat extends Adapter
       host: @options.host
       logger: @logger
       xmppDomain: @options.xmppDomain
+      reconnect: @options.reconnect
     host = if @options.host then @options.host else "hipchat.com"
     @logger.info "Connecting HipChat adapter..."
 
@@ -105,14 +95,8 @@ class HipChat extends Adapter
     connector.onDisconnect =>
       @logger.info "Disconnected from #{host}"
 
-      if @options.reconnect
-        @waitAndReconnect()
-
     connector.onError =>
       @logger.error [].slice.call(arguments).map(inspect).join(", ")
-
-      if @options.reconnect
-        @waitAndReconnect()
 
     firstTime = true
     connector.onConnect =>
