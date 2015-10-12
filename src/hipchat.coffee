@@ -90,6 +90,7 @@ class HipChat extends Adapter
       host: @options.host
       logger: @logger
       xmppDomain: @options.xmppDomain
+      bosh: @options.bosh
     host = if @options.host then @options.host else "hipchat.com"
     @logger.info "Connecting HipChat adapter..."
 
