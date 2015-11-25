@@ -46,7 +46,7 @@ This is a HipChat-specific version of the more general [instructions in the Hubo
 
 1. Add [Redis To Go](http://devcenter.heroku.com/articles/redistogo) to your Heroku app:
 
-        % heroku addons:add redistogo:nano
+        % heroku addons:create redistogo:nano --app our-company-hubot
 
 1. Configure it:
 
