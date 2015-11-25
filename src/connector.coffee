@@ -24,8 +24,6 @@
 fs = require "fs"
 {bind, isString, isRegExp} = require "underscore"
 xmpp = require 'node-xmpp-client'
-xmpp.Element = xmpp.ltx.Element
-xmpp.JID = require('node-xmpp-core').JID
 
 # Parse and cache the node package.json file when this module is loaded
 pkg = do ->
