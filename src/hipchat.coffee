@@ -3,50 +3,130 @@ HTTPS = require "https"
 {inspect} = require "util"
 Connector = require "./connector"
 promise = require "./promises"
+requestLib = require "request"
+fs = require 'fs'
+mime = require 'mime'
 
 class HipChat extends Adapter
 
   constructor: (robot) ->
     super robot
     @logger = robot.logger
+    @room_endpoint = "http://www.hipchat.com/v2/room"
     reconnectTimer = null
 
   emote: (envelope, strings...) ->
     @send envelope, strings.map((str) -> "/me #{str}")...
 
-  send: (envelope, strings...) ->
+  extractJid: (envelope) ->
     {user, room} = envelope
     user = envelope if not user # pre-2.4.2 style
+    # most common case - we're replying to a user in a room or 1-1
+    user?.reply_to or
+    # allows user objects to be passed in
+    user?.jid or
+    if user?.search?(/@/) >= 0
+      user # allows user to be a jid string
+    else
+      room # this will happen if someone uses robot.messageRoom(jid, ...)
 
-    target_jid =
-      # most common case - we're replying to a user in a room or 1-1
-      user?.reply_to or
-      # allows user objects to be passed in
-      user?.jid or
-      if user?.search?(/@/) >= 0
-        user # allows user to be a jid string
-      else
-        room # this will happen if someone uses robot.messageRoom(jid, ...)
 
+  send: (envelope, strings...) ->
+    
+    target_jid = extractJid(envelope)
+      
     if not target_jid
       return @logger.error "ERROR: Not sure who to send to: envelope=#{inspect envelope}"
 
     for str in strings
       @connector.message target_jid, str
 
-  topic: (envelope, message) ->
-    {user, room} = envelope
-    user = envelope if not user # pre-2.4.2 style
+  sendHtml: (envelope, strings...) ->
+    target_jid = extractJid(envelope)
+    target_id = @room_map[target_jid]
 
-    target_jid =
-      # most common case - we're replying to a user in a room or 1-1
-      user?.reply_to or
-      # allows user objects to be passed in
-      user?.jid or
-      if user?.search?(/@/) >= 0
-        user # allows user to be a jid string
-      else
-        room # this will happen if someone uses robot.messageRoom(jid, ...)
+    if not target_id
+      return @logger.error "ERROR: Not sure who to send html message to: envelope=#{inspect envelope}"
+
+    if not @options.token
+      return @logger.error "ERROR: A hubot api token must be set to send html messages"
+
+    fullMsg = strings.join('')
+
+    params =
+      url: "#{@room_endpoint}"
+      headers : 
+        'content-type' : 'text/html'
+      auth:
+        bearer : @options.token
+      body: fullMsg
+
+    requestLib.post params, (err,resp,body) ->
+      if err || response.statusCode >= 400
+        return @logger.error "Hipchat API error: #{resp.statusCode}"
+
+  # Send a file from hubot to a room
+  #   options =
+  #     name : the name to share the file with
+  #     path : send file from this path (a string)
+  #     data : send this base64 encoded data as a file
+  #     type (required) : the type of the file (text, pdf, json, csv etc...)
+  #     msg (optional) : a simple text msg to be posted along with the file
+  sendFile: (envelope, file_info) ->
+    target_jid = extractJid(envelope)
+    target_id = @room_map[target_jid]
+
+    if not target_id
+      return @logger.error "ERROR: Not sure who to send html message to: envelope=#{inspect envelope}"
+
+    if not @options.token
+      return @logger.error "ERROR: A hubot api token must be set to send html messages"
+
+    url = "#{@room_endpoint}/#{target_id}/share/file"
+    mimeType = mime.lookup(file_info.type)
+    ext = mime.extension(mimeType)
+
+    if not file_info.type || not mimeType
+      return @logger.error "ERROR: a valid type must be provided to sendFile. Type was: #{file_info.type}"
+
+    if not file_info.msg
+      file_info.msg = ''
+
+    if file_info.path
+      fs.readFile file_info.path, (err, data) ->
+        if err
+          return @logger.error "File Read Error: could not read from file path: #{file_info.path}"
+
+        sendMultipart url, file_info.name + ext, data, mimeType, file_info.msg
+
+    else if file_info.data
+      sendMultipart url, file_info.name, data, mimeType, file_info.msg
+
+    else
+      return @logger.error "ERROR: must specify either data or path for sendFile"
+
+  sendMutlipart: (path, name, data, mimeType, msg) ->
+    params =
+      url: path 
+      auth:
+        bearer: @options.token
+      multipart: [
+          'Content-Type': 'application/json; charset UTF-8',
+          'Content-Disposition': 'attachment; name="metadata"',
+          'body': JSON.stringify 'message': msg
+        ,
+          'Content-Type': 'file/' + mimeType,
+          'Content-Disposition': `attachment; name="file"; filename="${name}"`,
+          'body': data
+      ]
+
+    requestLib params, (err, resp, body) ->
+          if resp.statusCode > 400
+            return @logger.error "Hipchat API errror: #{resp.statusCode}"
+
+  topic: (envelope, message) ->
+
+    target_jid = extractJid(envelope)
 
     if not target_jid
       return @logger.error "ERROR: Not sure who to send to: envelope=#{inspect envelope}"
@@ -158,21 +238,30 @@ class HipChat extends Adapter
       init
         .done (users) =>
           saveUsers(users)
-          # Join requested rooms
-          if @options.rooms is "All" or @options.rooms is "@All"
-            connector.getRooms (err, rooms, stanza) =>
-              if rooms
-                for room in rooms
-                  if !@options.rooms_join_public && room.guest_url != ''
-                    @logger.info "Not joining #{room.jid} because it is a public room"
-                  else
-                    joinRoom(room.jid)
-              else
-                @logger.error "Can't list rooms: #{errmsg err}"
-          # Join all rooms
-          else
-            for room_jid in @options.rooms.split ","
-              joinRoom(room_jid)
+
+          connector.getRooms (err, rooms, stanza) =>
+
+            # Save room data to make api calls
+            if rooms
+              @room_map = {}
+              for room in rooms:
+                @room_map[room.jid] = room
+
+            # Join all rooms
+            if @options.rooms is "All" or @options.rooms is "@All"
+                if rooms
+                  for room in rooms
+                    if !@options.rooms_join_public && room.guest_url != ''
+                      @logger.info "Not joining #{room.jid} because it is a public room"
+                    else
+                      joinRoom(room.jid)
+                else
+                  @logger.error "Can't list rooms: #{errmsg err}"
+            # Join requested rooms
+            else
+              for room_jid in @options.rooms.split ","
+                joinRoom(room_jid)
+
         .fail (err) =>
           @logger.error "Can't list users: #{errmsg err}" if err
 

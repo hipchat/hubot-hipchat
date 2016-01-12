@@ -17,7 +17,7 @@
   "license": "MIT",
   "main": "./src/hipchat",
   "engines": {
-    "node" : "~0.12.2"
+    "node": "~0.12.2"
   },
   "dependencies": {
     "node-xmpp-client": "^2.1.0",
