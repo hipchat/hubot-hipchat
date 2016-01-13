@@ -32,20 +32,12 @@ class HipChat extends Adapter
     else
       room # this will happen if someone uses robot.messageRoom(jid, ...)
 
-  getRoomDetails: (envelope) ->
-    jid = @extractJid(envelope)
-
-    if not jid
-      return @logger.error "ERROR: Details for this room do not exist"
-
-    return @room_map[jid]
-
   send: (envelope, strings...) ->
 
     target_jid = @extractJid(envelope)
       
     if not target_jid
-      return @logger.error "Not sure who to send to: envelope=#{inspect envelope}"
+      return @logger.error "ERROR: Not sure who to send to: envelope=#{inspect envelope}"
 
     for str in strings
       @connector.message target_jid, str
