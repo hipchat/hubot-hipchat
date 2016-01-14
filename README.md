@@ -91,7 +91,7 @@ Bonus: Add a notification hook to Heroku so a notification is sent to a room whe
 robot.messageRoom("1234_room@conf.hipchat.com", "message");
 ```
 
-## hubot-hipchat specific featues
+## Features specific to hubot-hipchat
 
 In addition to the response methods provided by the normal hubot, such as ```resp.send```, hubot-hipchat provides these hipchat specific functions:
 * ```resp.sendHtml``` takes any number of strings and sticks them together as one html message post. For example, you can send a hyperlink by doing this:
