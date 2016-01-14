@@ -35,6 +35,7 @@ class HipChat extends Adapter
   send: (envelope, strings...) ->
 
     target_jid = @extractJid(envelope)
+    @logger.info inspect envelope
       
     if not target_jid
       return @logger.error "ERROR: Not sure who to send to: envelope=#{inspect envelope}"
