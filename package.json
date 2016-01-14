@@ -20,7 +20,6 @@
     "node": "~0.12.2"
   },
   "dependencies": {
-    "fs": "0.0.2",
     "mime": "^1.3.4",
     "node-xmpp-client": "^2.1.0",
     "request": "^2.67.0",

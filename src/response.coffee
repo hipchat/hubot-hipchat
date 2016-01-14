@@ -1,6 +1,6 @@
 {Response} = require 'hubot'
 
-class HipchatResponse extends Response
+class HipChatResponse extends Response
 
 	sendFile: (file_info) ->
 		@robot.adapter.sendFile(@envelope, file_info)
@@ -8,4 +8,4 @@ class HipchatResponse extends Response
 	sendHtml: (strings...) ->
 		@robot.adapter.sendHtml(@envelope, strings...)
 
-module.exports = HipchatResponse
+module.exports = HipChatResponse

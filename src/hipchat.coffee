@@ -1,12 +1,12 @@
-{Adapter, TextMessage, EnterMessage, LeaveMessage, TopicMessage, User} = require "hubot"
+fs = require "fs"
 HTTPS = require "https"
+{Adapter, TextMessage, EnterMessage, LeaveMessage, TopicMessage, User} = require "hubot"
 {inspect} = require "util"
+requestLib = require "request" # requestLib to avoid confusion with adapter's request method
+mime = require "mime"
 Connector = require "./connector"
 promise = require "./promises"
-requestLib = require "request"
-fs = require 'fs'
-mime = require 'mime'
-HipchatResponse = require './response'
+HipChatResponse = require './response'
 
 class HipChat extends Adapter
 
@@ -14,7 +14,7 @@ class HipChat extends Adapter
     super robot
     @logger = robot.logger
     @room_endpoint = "http://www.hipchat.com/v2/room"
-    @robot.Response = HipchatResponse
+    @robot.Response = HipChatResponse
     reconnectTimer = null
 
   emote: (envelope, strings...) ->
@@ -49,7 +49,7 @@ class HipChat extends Adapter
       return @logger.error "Not sure who to send html message to: envelope=#{inspect envelope}"
 
     if not @options.token
-      return @logger.error "A hubot api token must be set to send html messages"
+      return @logger.error "Must set HUBOT_HIPCHAT_TOKEN to send html messages"
 
     room_id = @room_map[target_jid].id
     fullMsg = strings.join('')
@@ -64,10 +64,10 @@ class HipChat extends Adapter
 
     requestLib.post params, (err,resp,body) =>
       if err || resp.statusCode >= 400
-        return @logger.error "Hipchat API error: #{resp.statusCode}"
+        return @logger.error "HipChat API error: #{resp.statusCode}"
 
   # Send a file from hubot
-  #   options =
+  #   file_info =
   #     name : the name to share the file with
   #     path : send file from this path (a string)
   #     data : send this base64 encoded data as a file
@@ -80,7 +80,7 @@ class HipChat extends Adapter
       return @logger.error "Not sure who to send file to: envelope=#{inspect envelope}"
 
     if not @options.token
-      return @logger.error "A hubot api token must be set to send html messages"
+      return @logger.error "Must set HUBOT_HIPCHAT_TOKEN to send html messages"
 
     room_id = @room_map[target_jid].id
     url = "#{@room_endpoint}/#{room_id}/share/file"
@@ -108,8 +108,8 @@ class HipChat extends Adapter
 
   sendMultipart: (path, name, data, mimeType, msg) ->
 
-    # Weird stuff from the hipchat api
-    # Must have filename="name" etc... with double quotes not single  
+    # Must have filename="name" etc... in double quotes not single
+    quotedName = '"' + name + '"' 
     params =
       method: 'POST'
       url: path 
@@ -124,14 +124,14 @@ class HipChat extends Adapter
         ,
         {
           "Content-Type": "file/" + mimeType,
-          "Content-Disposition": 'attachment; name="file"; filename="' + name + '"',
+          "Content-Disposition": 'attachment; name="file"; filename=' + quotedName,
           "body": data
         }
       ]
 
     requestLib params, (err, resp, body) =>
           if resp.statusCode >= 400
-            return @logger.error "Hipchat API errror: #{resp.statusCode}"
+            return @logger.error "HipChat API errror: #{resp.statusCode}"
             
 
   topic: (envelope, message) ->
