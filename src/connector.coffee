@@ -64,6 +64,7 @@ module.exports = class Connector extends EventEmitter
     @host = options.host
     @caps_ver = options.caps_ver or "hubot-hipchat:#{pkg.version}"
     @xmppDomain = options.xmppDomain
+    @bosh = options.bosh
 
     # Multi-User-Conference (rooms) service host. Use when directing stanzas
     # to the MUC service.
@@ -77,6 +78,7 @@ module.exports = class Connector extends EventEmitter
       jid: @jid,
       password: @password,
       host: @host
+      bosh: @bosh
 
     @jabber.on "error", bind(onStreamError, @)
     @jabber.on "online", bind(onOnline, @)
