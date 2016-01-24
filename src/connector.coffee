@@ -500,7 +500,6 @@ onStanza = (stanza) ->
 
 onOffline = ->
   @logger.info 'Connection went offline'
-  @disconnect()
 
 onClose = ->
   @logger.info 'Connection was closed'
