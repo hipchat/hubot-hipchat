@@ -64,6 +64,7 @@ module.exports = class Connector extends EventEmitter
     @host = options.host
     @caps_ver = options.caps_ver or "hubot-hipchat:#{pkg.version}"
     @xmppDomain = options.xmppDomain
+    @bosh = options.bosh
 
     # Multi-User-Conference (rooms) service host. Use when directing stanzas
     # to the MUC service.
@@ -77,6 +78,7 @@ module.exports = class Connector extends EventEmitter
       jid: @jid,
       password: @password,
       host: @host
+      bosh: @bosh
 
     @jabber.on "error", bind(onStreamError, @)
     @jabber.on "online", bind(onOnline, @)
@@ -135,7 +137,7 @@ module.exports = class Connector extends EventEmitter
         stanza.getChild("query").getChildren("item").map (el) ->
           x = el.getChild "x", "http://hipchat.com/protocol/muc#room"
           # A room
-          jid: el.attrs.jid
+          jid: el.attrs.jid.trim()
           name: el.attrs.name
           id: getInt(x, "id")
           topic: getText(x, "topic")
@@ -500,7 +502,6 @@ onStanza = (stanza) ->
 
 onOffline = ->
   @logger.info 'Connection went offline'
-  @disconnect()
 
 onClose = ->
   @logger.info 'Connection was closed'
