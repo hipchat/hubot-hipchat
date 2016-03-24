@@ -83,7 +83,7 @@ This is a HipChat-specific version of the more general [instructions in the Hubo
 
 1. To deploy an updated version of the bot, simply commit your changes and run `git push heroku master` again.
 
-Bonus: Add a notification hook to Heroku so a notification is sent to a room whenever the bot is updated: https://www.hipchat.com/help/page/heroku-integration
+Bonus: Add a notification hook to Heroku so a notification is sent to a room whenever the bot is updated: https://marketplace.atlassian.com/plugins/com.heroku.hipchat/cloud/overview
 
 ## Scripting Gotchas
 `robot.messageRoom` syntax is as follows
