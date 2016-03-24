@@ -17,10 +17,12 @@
   "license": "MIT",
   "main": "./src/hipchat",
   "engines": {
-    "node" : "~0.12.2"
+    "node": "~0.12.2"
   },
   "dependencies": {
+    "mime": "^1.3.4",
     "node-xmpp-client": "^2.1.0",
+    "request": "^2.67.0",
     "rsvp": "~1.2.0",
     "underscore": "~1.4.4"
   }

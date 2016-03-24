@@ -91,6 +91,27 @@ Bonus: Add a notification hook to Heroku so a notification is sent to a room whe
 robot.messageRoom("1234_room@conf.hipchat.com", "message");
 ```
 
+## Features specific to hubot-hipchat
+
+In addition to the response methods provided by the normal hubot, such as ```resp.send```, hubot-hipchat provides these hipchat specific functions:
+* ```resp.sendHtml``` takes any number of strings and sticks them together as one html message post. For example, you can send a hyperlink by doing this:
+```
+robot.respond /send hyperlink/i, (resp)->
+  resp.sendHtml "<a href='https://hipchat.com'>hipchat site</a>"
+```
+
+* ```resp.sendFile``` takes an object that contains either file data or a path to a file along with other file info and posts the file to a room with an optional message:
+```
+robot.respond /send file/i, (resp) ->
+  file_info =
+    name : "the name people will see in the room"
+    path : 'path/to/file.text'
+    type: "text" # required
+    msg : "optional message to post when file is uploaded"
+
+  resp.sendFile file_info
+```
+
 ## Adapter configuration
 
 This adapter uses the following environment variables:
@@ -134,6 +155,10 @@ Optional. Set to `debug` to enable detailed debug logging.
 ### HUBOT\_HIPCHAT\_RECONNECT
 
 Optional. Seting to `false` will prevent the HipChat adapter from auto-reconnecting if it detects a server error or disconnection.
+
+### HUBOT\_HIPCHAT\_TOKEN
+
+Optional. Set to the value of an API token for HipChat. Generate an API token [here](https://cs10.hipchat.com/account/api) (and give it the necessary scopes to post in rooms, the easiest way is just give it access to all scopes).  This needs to be set in order to use the sendFile and sendHtml methods.
 
 ## Running locally
 
