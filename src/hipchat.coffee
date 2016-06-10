@@ -15,24 +15,8 @@ class HipChat extends Adapter
     @send envelope, strings.map((str) -> "/me #{str}")...
 
   send: (envelope, strings...) ->
-    {user, room} = envelope
-    user = envelope if not user # pre-2.4.2 style
-
-    target_jid =
-      # most common case - we're replying to a user in a room or 1-1
-      user?.reply_to or
-      # allows user objects to be passed in
-      user?.jid or
-      if user?.search?(/@/) >= 0
-        user # allows user to be a jid string
-      else
-        room # this will happen if someone uses robot.messageRoom(jid, ...)
-
-    if not target_jid
-      return @logger.error "ERROR: Not sure who to send to: envelope=#{inspect envelope}"
-
     for str in strings
-      @connector.message target_jid, str
+      @connector.message envelope.room, str
 
   topic: (envelope, message) ->
     {user, room} = envelope
@@ -105,7 +89,7 @@ class HipChat extends Adapter
     connector.onTopic (channel, from, message) =>
       @logger.info "Topic change: " + message
       author = getAuthor: => @robot.brain.userForName(from) or new User(from)
-      author.room = @roomNameFromJid(channel)
+      author.room = channel
       @receive new TopicMessage(author, message, 'id')
 
 
@@ -190,9 +174,8 @@ class HipChat extends Adapter
         # buffer message events until the roster fetch completes
         # to ensure user data is properly loaded
         init.done =>
-          {getAuthor, message, reply_to, room} = opts
-          author = Object.create(getAuthor()) or {}
-          author.reply_to = reply_to
+          {getAuthor, message, room} = opts
+          author = getAuthor() or {}
           author.room = room
           @receive new TextMessage(author, message)
 
@@ -206,8 +189,7 @@ class HipChat extends Adapter
           handleMessage
             getAuthor: => @robot.brain.userForName(from) or new User(from)
             message: message
-            reply_to: channel
-            room: @roomNameFromJid(channel)
+            room: channel
 
         connector.onPrivateMessage (from, message) =>
           # remove leading @mention name if present and format the message like
@@ -218,7 +200,7 @@ class HipChat extends Adapter
           handleMessage
             getAuthor: => @robot.brain.userForId(@userIdFromJid from)
             message: message
-            reply_to: from
+            room: from
 
       changePresence = (PresenceMessage, user_jid, room_jid, currentName) =>
         # buffer presence events until the roster fetch completes
@@ -252,12 +234,6 @@ class HipChat extends Adapter
       jid.match(/^\d+_(\d+)@chat\./)[1]
     catch e
       @logger.error "Bad user JID: #{jid}"
-
-  roomNameFromJid: (jid) ->
-    try
-      jid.match(/^\d+_(.+)@conf\./)[1]
-    catch e
-      @logger.error "Bad room JID: #{jid}"
 
   # Convenience HTTP Methods for posting on behalf of the token'd user
   get: (path, callback) ->
