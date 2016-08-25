@@ -9,6 +9,7 @@ class HipChat extends Adapter
   constructor: (robot) ->
     super robot
     @logger = robot.logger
+    @rooms = {}
     reconnectTimer = null
 
   emote: (envelope, strings...) ->
@@ -26,6 +27,9 @@ class HipChat extends Adapter
       if user?.search?(/@/) >= 0
         user # allows user to be a jid string
       else
+        user = @robot.brain.userForName room
+        @rooms[room]?.jid or
+        user?.jid or
         room # this will happen if someone uses robot.messageRoom(jid, ...)
 
     if not target_jid
@@ -46,6 +50,9 @@ class HipChat extends Adapter
       if user?.search?(/@/) >= 0
         user # allows user to be a jid string
       else
+        user = @robot.brain.userForName room
+        @rooms[room]?.jid or
+        user?.jid or
         room # this will happen if someone uses robot.messageRoom(jid, ...)
 
     if not target_jid
@@ -173,6 +180,7 @@ class HipChat extends Adapter
                   if !@options.rooms_join_public && room.guest_url != ''
                     @logger.info "Not joining #{room.jid} because it is a public room"
                   else
+                    @rooms[room.name] = room
                     joinRoom(room.jid)
               else
                 @logger.error "Can't list rooms: #{errmsg err}"
