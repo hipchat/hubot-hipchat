@@ -27,6 +27,9 @@ class HipChat extends Adapter
       if user?.search?(/@/) >= 0
         user # allows user to be a jid string
       else
+        user = @robot.brain.userForName room
+        @rooms[room]?.jid or
+        user?.jid or
         room # this will happen if someone uses robot.messageRoom(jid, ...)
 
     if not target_jid
@@ -47,6 +50,9 @@ class HipChat extends Adapter
       if user?.search?(/@/) >= 0
         user # allows user to be a jid string
       else
+        user = @robot.brain.userForName room
+        @rooms[room]?.jid or
+        user?.jid or
         room # this will happen if someone uses robot.messageRoom(jid, ...)
 
     if not target_jid
