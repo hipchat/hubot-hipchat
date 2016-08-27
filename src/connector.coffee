@@ -130,7 +130,7 @@ module.exports = class Connector extends EventEmitter
   #   - `stanza`: Full response stanza, an `xmpp.Element`
   getRooms: (callback) ->
     iq = new xmpp.Element("iq", to: this.mucDomain, type: "get")
-      .c("query", xmlns: "http://jabber.org/protocol/disco#items");
+      .c "query", xmlns: "http://jabber.org/protocol/disco#items", include_archived: true
     @sendIq iq, (err, stanza) ->
       rooms = if err then [] else
         # Parse response into objects
@@ -146,6 +146,24 @@ module.exports = class Connector extends EventEmitter
           guest_url: getText(x, "guest_url")
           is_archived: !!getChild(x, "is_archived")
       callback err, (rooms or []), stanza
+
+  getRoom: (jid, callback) ->
+    iq = new xmpp.Element("iq", to: jid, type: "get")
+      .c "query", xmlns: "http://jabber.org/protocol/disco#info", include_archived: true
+    @sendIq iq, (err, stanza) ->
+      q = stanza.getChild "query"
+      i = q.getChild "identity"
+      x = q.getChild "x"
+      room =
+        jid: jid.toString()
+        name: i.attrs.name
+        id: getInt x, "id"
+        topic: getText x, "topic"
+        privacy: getText x, "privacy"
+        owner: getText x, "owner"
+        guest_url: getText x, "guest_url"
+        is_archived: !!getChild x, "is_archived"
+      callback err, room
 
   # Fetches the roster (buddy list)
   #

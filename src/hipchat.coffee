@@ -240,10 +240,11 @@ class HipChat extends Adapter
           changePresence LeaveMessage, user_jid, room_jid
 
         connector.onInvite (room_jid, from_jid, message) =>
-          setRooms()
           action = if @options.autojoin then "joining" else "ignoring"
           @logger.info "Got invite to #{room_jid} from #{from_jid} - #{action}"
           joinRoom(room_jid) if @options.autojoin
+          connector.getRoom room_jid, (err, room) =>
+            @rooms[room.jid] = room
 
       firstTime = false
     connector.connect()
