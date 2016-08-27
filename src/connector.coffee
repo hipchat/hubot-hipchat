@@ -348,6 +348,8 @@ module.exports = class Connector extends EventEmitter
 
   onRoomPushes: (callback) -> @on "roomPushes", callback
 
+  onRoomDeleted: (callback) -> @on "roomDeleted", callback
+
   # Emitted whenever the connector pings the server (roughly every 30 seconds).
   #
   # - `callback`: Function to be triggered: `function ()`
@@ -479,9 +481,12 @@ onStanza = (stanza) ->
           @emit "rosterChange", users, stanza
         when "http://hipchat.com/protocol/muc#room"
           i = q.getChild("item")
-          return if i.attrs.status == "deleted"
+          jid = i.attrs.jid
+          if i.attrs.status == "deleted"
+            @emit "roomDeleted", jid
+            return
           room =
-            jid: i.attrs.jid
+            jid: jid
             name: i.attrs.name
             id: getInt(i, "id")
             topic: getText(i, "topic")

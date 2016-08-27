@@ -185,6 +185,9 @@ class HipChat extends Adapter
             joinRoom room.jid
           @rooms[room.jid] = room
 
+      connector.onRoomDeleted (jid) =>
+        delete @rooms[jid]
+
       handleMessage = (opts) =>
         # buffer message events until the roster fetch completes
         # to ensure user data is properly loaded
