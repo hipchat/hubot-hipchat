@@ -19,19 +19,7 @@ class HipChat extends Adapter
     {user, room} = envelope
     user = envelope if not user # pre-2.4.2 style
 
-    target_jid =
-      # most common case - we're replying to a user in a room or 1-1
-      user?.reply_to or
-      # allows user objects to be passed in
-      user?.jid or
-      if user?.search?(/@/) >= 0
-        user # allows user to be a jid string
-      else
-        user = @robot.brain.userForName room
-        @roomJidFromName room or
-        user?.jid or
-        room # this will happen if someone uses robot.messageRoom(jid, ...)
-
+    target_jid = @targetJid user, room
     if not target_jid
       return @logger.error "ERROR: Not sure who to send to: envelope=#{inspect envelope}"
 
@@ -42,19 +30,7 @@ class HipChat extends Adapter
     {user, room} = envelope
     user = envelope if not user # pre-2.4.2 style
 
-    target_jid =
-      # most common case - we're replying to a user in a room or 1-1
-      user?.reply_to or
-      # allows user objects to be passed in
-      user?.jid or
-      if user?.search?(/@/) >= 0
-        user # allows user to be a jid string
-      else
-        user = @robot.brain.userForName room
-        @roomJidFromName room or
-        user?.jid or
-        room # this will happen if someone uses robot.messageRoom(jid, ...)
-
+    target_jid = @targetJid user, room
     if not target_jid
       return @logger.error "ERROR: Not sure who to send to: envelope=#{inspect envelope}"
 
@@ -281,6 +257,18 @@ class HipChat extends Adapter
     for _, room of @rooms
       if room.name == name
         return room.jid
+
+  targetJid: (user, room) ->
+    # most common case - we're replying to a user in a room or 1-1
+    user?.reply_to or
+    # allows user objects to be passed in
+    user?.jid or
+    if user?.search?(/@/) >= 0
+      user # allows user to be a jid string
+    else
+      @robot.brain.userForName(room)?.jid or
+      @roomJidFromName room or
+      room # this will happen if someone uses robot.messageRoom(jid, ...)
 
   # Convenience HTTP Methods for posting on behalf of the token'd user
   get: (path, callback) ->
