@@ -28,7 +28,7 @@ class HipChat extends Adapter
         user # allows user to be a jid string
       else
         user = @robot.brain.userForName room
-        @rooms[room]?.jid or
+        @roomJidFromName room or
         user?.jid or
         room # this will happen if someone uses robot.messageRoom(jid, ...)
 
@@ -51,7 +51,7 @@ class HipChat extends Adapter
         user # allows user to be a jid string
       else
         user = @robot.brain.userForName room
-        @rooms[room]?.jid or
+        @roomJidFromName room or
         user?.jid or
         room # this will happen if someone uses robot.messageRoom(jid, ...)
 
@@ -112,7 +112,7 @@ class HipChat extends Adapter
     connector.onTopic (channel, from, message) =>
       @logger.info "Topic change: " + message
       author = getAuthor: => @robot.brain.userForName(from) or new User(from)
-      author.room = @roomNameFromJid(channel)
+      author.room = @rooms[channel].name
       @receive new TopicMessage(author, message, 'id')
 
 
@@ -157,7 +157,7 @@ class HipChat extends Adapter
         connector.getRooms (err, rooms, stanza) =>
           if rooms
             for room in rooms
-              @rooms[room.name] = room
+              @rooms[room.jid] = room
           else
             return @logger.error "Can't list rooms: #{errmsg err}"
 
@@ -224,7 +224,7 @@ class HipChat extends Adapter
             getAuthor: => @robot.brain.userForName(from) or new User(from)
             message: message
             reply_to: channel
-            room: @roomNameFromJid(channel)
+            room: @rooms[channel].name
 
         connector.onPrivateMessage (from, message) =>
           # remove leading @mention name if present and format the message like
@@ -271,10 +271,10 @@ class HipChat extends Adapter
     catch e
       @logger.error "Bad user JID: #{jid}"
 
-  roomNameFromJid: (jid) ->
-    for _, room of (@rooms or {})
-      if room.jid == jid
-        return room.name
+  roomJidFromName: (name) ->
+    for _, room of @rooms
+      if room.name == name
+        return room.jid
 
   # Convenience HTTP Methods for posting on behalf of the token'd user
   get: (path, callback) ->
