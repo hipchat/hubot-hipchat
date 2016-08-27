@@ -492,13 +492,13 @@ onStanza = (stanza) ->
       @emit event_id, null, stanza
     else if stanza.attrs.type is "set"
       # Check for roster push
-      q = stanza.getChild("query")
+      q = stanza.getChild "query"
       switch q.attrs.xmlns
         when "jabber:iq:roster"
-          users = usersFromStanza(stanza)
+          users = usersFromStanza stanza
           @emit "rosterChange", users, stanza
         when "http://hipchat.com/protocol/muc#room"
-          i = q.getChild("item")
+          i = q.getChild "item"
           jid = i.attrs.jid
           if i.attrs.status == "deleted"
             @emit "roomDeleted", jid
@@ -506,12 +506,12 @@ onStanza = (stanza) ->
           room =
             jid: jid
             name: i.attrs.name
-            id: getInt(i, "id")
-            topic: getText(i, "topic")
-            privacy: getText(i, "privacy")
-            owner: getText(i, "owner")
-            guest_url: getText(i, "guest_url")
-            is_archived: !!getChild(i, "is_archived")
+            id: getInt i, "id"
+            topic: getText i, "topic"
+            privacy: getText i, "privacy"
+            owner: getText i, "owner"
+            guest_url: getText i, "guest_url"
+            is_archived: !!getChild i, "is_archived"
           @emit "roomPushes", room
     else
       # IQ error response
