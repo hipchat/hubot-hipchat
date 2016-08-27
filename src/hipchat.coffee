@@ -9,6 +9,7 @@ class HipChat extends Adapter
   constructor: (robot) ->
     super robot
     @logger = robot.logger
+    @rooms = {}
     reconnectTimer = null
 
   emote: (envelope, strings...) ->
@@ -146,6 +147,17 @@ class HipChat extends Adapter
             delete @robot.brain.data.users[user.id]
           @robot.brain.userForId user.id, user
 
+      setRooms = (callback) =>
+        connector.getRooms (err, rooms, stanza) =>
+          if rooms
+            for room in rooms
+              @rooms[room.name] = room
+          else
+            return @logger.error "Can't list rooms: #{errmsg err}"
+
+          if callback?
+            callback()
+
       joinRoom = (jid) =>
         if jid and typeof jid is "object"
           jid = "#{jid.local}@#{jid.domain}"
@@ -165,21 +177,20 @@ class HipChat extends Adapter
       init
         .done (users) =>
           saveUsers(users)
-          # Join requested rooms
-          if @options.rooms is "All" or @options.rooms is "@All"
-            connector.getRooms (err, rooms, stanza) =>
-              if rooms
-                for room in rooms
-                  if !@options.rooms_join_public && room.guest_url != ''
-                    @logger.info "Not joining #{room.jid} because it is a public room"
-                  else
-                    joinRoom(room.jid)
-              else
-                @logger.error "Can't list rooms: #{errmsg err}"
-          # Join all rooms
-          else
-            for room_jid in @options.rooms.split ","
-              joinRoom(room_jid)
+
+          setRooms =>
+            # Join requested rooms
+            if @options.rooms is "All" or @options.rooms is "@All"
+              for _, room of @rooms
+                if !@options.rooms_join_public && room.guest_url != ''
+                  @logger.info "Not joining #{room.jid} because it is a public room"
+                else
+                  joinRoom room.jid
+            # Join all rooms
+            else
+              for room_jid in @options.rooms.split ","
+                joinRoom room_jid
+
         .fail (err) =>
           @logger.error "Can't list users: #{errmsg err}" if err
 
@@ -238,6 +249,7 @@ class HipChat extends Adapter
           changePresence LeaveMessage, user_jid, room_jid
 
         connector.onInvite (room_jid, from_jid, message) =>
+          setRooms()
           action = if @options.autojoin then "joining" else "ignoring"
           @logger.info "Got invite to #{room_jid} from #{from_jid} - #{action}"
           joinRoom(room_jid) if @options.autojoin
@@ -254,10 +266,9 @@ class HipChat extends Adapter
       @logger.error "Bad user JID: #{jid}"
 
   roomNameFromJid: (jid) ->
-    try
-      jid.match(/^\d+_(.+)@conf\./)[1]
-    catch e
-      @logger.error "Bad room JID: #{jid}"
+    for _, room of (@rooms or {})
+      if room.jid == jid
+        return room.name
 
   # Convenience HTTP Methods for posting on behalf of the token'd user
   get: (path, callback) ->
