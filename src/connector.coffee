@@ -346,6 +346,8 @@ module.exports = class Connector extends EventEmitter
 
   onRosterChange: (callback) -> @on "rosterChange", callback
 
+  onRoomPushes: (callback) -> @on "roomPushes", callback
+
   # Emitted whenever the connector pings the server (roughly every 30 seconds).
   #
   # - `callback`: Function to be triggered: `function ()`
@@ -470,9 +472,24 @@ onStanza = (stanza) ->
       @emit event_id, null, stanza
     else if stanza.attrs.type is "set"
       # Check for roster push
-      if stanza.getChild("query").attrs.xmlns is "jabber:iq:roster"
-        users = usersFromStanza(stanza)
-        @emit "rosterChange", users, stanza
+      q = stanza.getChild("query")
+      switch q.attrs.xmlns
+        when "jabber:iq:roster"
+          users = usersFromStanza(stanza)
+          @emit "rosterChange", users, stanza
+        when "http://hipchat.com/protocol/muc#room"
+          i = q.getChild("item")
+          return if i.attrs.status == "deleted"
+          room =
+            jid: i.attrs.jid
+            name: i.attrs.name
+            id: getInt(i, "id")
+            topic: getText(i, "topic")
+            privacy: getText(i, "privacy")
+            owner: getText(i, "owner")
+            guest_url: getText(i, "guest_url")
+            is_archived: !!getChild(i, "is_archived")
+          @emit "roomPushes", room
     else
       # IQ error response
       # ex: http://xmpp.org/rfcs/rfc6121.html#roster-syntax-actions-result

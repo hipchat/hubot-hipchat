@@ -203,6 +203,12 @@ class HipChat extends Adapter
       connector.onRosterChange (users) =>
         saveUsers(users)
 
+      connector.onRoomPushes (room) =>
+        if @options.rooms is "All" or @options.rooms is "@All"
+          if !@rooms[room.jid]
+            joinRoom room.jid
+          @rooms[room.jid] = room
+
       handleMessage = (opts) =>
         # buffer message events until the roster fetch completes
         # to ensure user data is properly loaded
