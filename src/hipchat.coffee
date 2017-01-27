@@ -186,6 +186,15 @@ class HipChat extends Adapter
       connector.onRosterChange (users) =>
         saveUsers(users)
 
+      getAuthorForChannel = (from, channel) =>
+        users = @robot.brain.usersForFuzzyName from
+        roomUser = null
+        for user in users
+          if user.room == channel
+            roomUser = user
+            break
+        roomUser
+
       handleMessage = (opts) =>
         # buffer message events until the roster fetch completes
         # to ensure user data is properly loaded
@@ -204,7 +213,7 @@ class HipChat extends Adapter
           regex = new RegExp "^@#{mention_name}\\b", "i"
           message = message.replace regex, "#{mention_name}: "
           handleMessage
-            getAuthor: => @robot.brain.userForName(from) or new User(from)
+            getAuthor: => getAuthorForChannel(from, channel) or new User(from)
             message: message
             reply_to: channel
             room: @roomNameFromJid(channel)
