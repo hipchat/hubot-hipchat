@@ -147,6 +147,7 @@ class HipChat extends Adapter
           @robot.brain.userForId user.id, user
 
       joinRoom = (jid) =>
+        joinroom = 1
         if jid and typeof jid is "object"
           jid = "#{jid.local}@#{jid.domain}"
 
@@ -159,8 +160,8 @@ class HipChat extends Adapter
             for room in rooms
               if !@options.rooms_join_public && room.guest_url != '' && room.jid == jid
                 @logger.info "Not joining #{room.jid} because it is a public room"
-                return
-        connector.join jid
+                joinroom = 0
+        connector.join jid unless joinroom == 0
       # Fetch user info
       connector.getRoster (err, users, stanza) =>
         return init.reject err if err
