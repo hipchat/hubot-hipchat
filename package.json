@@ -20,7 +20,7 @@
     "node": "~0.12.2"
   },
   "dependencies": {
-    "node-xmpp-client": "^3.0.0",
+    "node-xmpp-client": "^3.2.0",
     "rsvp": "~1.2.0",
     "underscore": "~1.4.4"
   }
