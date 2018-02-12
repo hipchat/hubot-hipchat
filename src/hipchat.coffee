@@ -138,9 +138,15 @@ class HipChat extends Adapter
           @logger.info "Not joining #{jid} because it is blacklisted"
           return
 
-        @logger.info "Joining #{jid}"
-        connector.join jid
-
+        connector.getRooms (err, rooms, stanza) =>
+          if rooms
+            for room in rooms
+              if !@options.rooms_join_public && room.guest_url != '' && room.jid == jid
+                @logger.info "Not joining #{room.jid} because it is a public room"
+                return
+              else if room.jid == jid
+                connector.join jid
+                return
       # Fetch user info
       connector.getRoster (err, users, stanza) =>
         return init.reject err if err
