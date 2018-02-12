@@ -70,6 +70,7 @@ module.exports = class Connector extends EventEmitter
     # to the MUC service.
     @mucDomain = "conf.#{if @xmppDomain then @xmppDomain else 'hipchat.com'}"
 
+    @disconnecting = false
     @onError @disconnect
 
   # Connects the connector to HipChat and sets the XMPP event listeners.
@@ -98,12 +99,16 @@ module.exports = class Connector extends EventEmitter
   # Disconnect the connector from HipChat, remove the anti-idle and emit the
   # `disconnect` event.
   disconnect: =>
-    @logger.debug 'Disconnecting here'
-    if @keepalive
-      clearInterval @keepalive
-      delete @keepalive
-    @jabber.end()
-    @emit "disconnect"
+    # since we're going to emit "disconnect" event in the end, we should prevent ourself from handling it here
+    if ! @disconnecting
+      @disconnecting = true
+      @logger.debug 'Disconnecting here'
+      if @keepalive
+        clearInterval @keepalive
+        delete @keepalive
+      @jabber.end()
+      @emit "disconnect"
+      @disconnecting = false
 
   # Fetches our profile info
   #
