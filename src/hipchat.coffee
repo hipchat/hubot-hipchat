@@ -14,7 +14,7 @@ class HipChat extends Adapter
   emote: (envelope, strings...) ->
     @send envelope, strings.map((str) -> "/me #{str}")...
 
-  send: (envelope, strings...) ->
+  send: (envelope, strings...) =>
     for str in strings
       @connector.message envelope.room, str
 
